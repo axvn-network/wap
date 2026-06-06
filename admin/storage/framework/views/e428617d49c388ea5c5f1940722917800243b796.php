@@ -1,0 +1,1 @@
+﻿请访问正确的地址！<?php /**PATH D:\phpnew\013kaiyun\admin\resources\views/web/template/mb12/index.blade.php ENDPATH**/ ?>
