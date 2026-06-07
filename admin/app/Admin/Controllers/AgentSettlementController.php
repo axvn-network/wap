@@ -10,8 +10,8 @@ use Dcat\Admin\Http\Controllers\AdminController;
 
 class AgentSettlementController extends AdminController
 {
+    protected $title = 'Quyết toán hoa hồng đại lý';
 
-    protected $type = [1 => '返点',2 => '返佣'];
     /**
      * Make a grid builder.
      *
@@ -19,23 +19,31 @@ class AgentSettlementController extends AdminController
      */
     protected function grid()
     {
-        return Grid::make(new AgentSettlement(), function (Grid $grid) {
-            $grid->column('id')->sortable();
-            $grid->column('name');
-            $grid->column('type')->using($this->type);
-            $grid->column('member_fs','代理返佣(%)');
-            // $grid->column('state');
-            $grid->column('created_at');
-            // $grid->column('updated_at')->sortable();
+        return Grid::make(AgentSettlement::with(['user_data']), function (Grid $grid) {
+            $grid->model()->orderBy('id', 'desc');
+
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('user_data.username', 'Tên người dùng');
+            $grid->column('money', 'Số tiền');
+            $grid->column('state', 'Trạng thái')->using([
+                1 => 'Đang chờ duyệt',
+                2 => 'Đã duyệt',
+                3 => 'Đã từ chối'
+            ])->dot([
+                1 => 'primary',
+                2 => 'success',
+                3 => 'danger'
+            ]);
+            $grid->column('created_at', 'Thời gian tạo');
 
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->equal('id');
+                $filter->like('user_data.username', 'Tên người dùng');
+            });
 
-            });
-            $grid->actions(function (Grid\Displayers\Actions $actions) {
-                $actions->disableDelete();
-                $actions->disableView();
-            });
+            $grid->disableCreateButton();
+            $grid->disableDeleteButton();
+            $grid->disableEditButton();
         });
     }
 
@@ -50,16 +58,8 @@ class AgentSettlementController extends AdminController
     {
         return Show::make($id, new AgentSettlement(), function (Show $show) {
             $show->field('id');
-            $show->field('name');
-            $show->field('type');
-  /*          $show->field('realperson');
-            $show->field('electron');
-            $show->field('joker');
-            $show->field('sport');
-            $show->field('fish');
-            $show->field('lottery');
-            $show->field('e_sport');*/
-            $show->field('member_fs');
+            $show->field('user_id');
+            $show->field('money');
             $show->field('state');
             $show->field('created_at');
             $show->field('updated_at');
@@ -75,27 +75,12 @@ class AgentSettlementController extends AdminController
     {
         return Form::make(new AgentSettlement(), function (Form $form) {
             $form->display('id');
-            $form->text('name')->required();
-            $form->hidden('type')->default(2);
-/*            $form->number('realperson');
-            $form->number('electron');
-            $form->number('joker');
-            $form->number('sport');
-            $form->number('fish');
-            $form->number('lottery');
-            $form->number('e_sport');*/
-            $form->number('member_fs',"返佣(%)");
-            // $form->text('state');
+            $form->display('user_id');
+            $form->display('money');
+            $form->display('state');
 
             $form->display('created_at');
             $form->display('updated_at');
-
-            $form->tools(function (Form\Tools $tools) {
-                // 去掉跳转详情页按钮
-                $tools->disableView();
-                // 去掉删除按钮
-                $tools->disableDelete();
-            });
         });
     }
 }

@@ -5,36 +5,36 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">支付订单</div>
+                <div class="card-header">Đơn hàng thanh toán</div>
 
                 <div class="card-body">
                     <div class="order-info mb-4">
-                        <h5>订单信息</h5>
-                        <p>订单号：{{ $order_no }}</p>
-                        <p>支付金额：{{ number_format($payment_data['amount'], 2) }} 元</p>
+                        <h5>Thông tin đơn hàng</h5>
+                        <p>Mã đơn hàng:{{ $order_no }}</p>
+                        <p>Số tiền thanh toán:{{ number_format($payment_data['amount'], 2) }} đồng</p>
                     </div>
 
                     @if($channel->type == 'alipay')
                         <div class="alipay-payment">
                             <div id="alipay-qrcode"></div>
-                            <p class="text-center mt-3">请使用支付宝扫码支付</p>
+                            <p class="text-center mt-3">Vui lòng sử dụng Alipay để quét mã thanh toán</p>
                         </div>
                     @elseif($channel->type == 'wechat')
                         <div class="wechat-payment">
                             <div id="wechat-qrcode"></div>
-                            <p class="text-center mt-3">请使用微信扫码支付</p>
+                            <p class="text-center mt-3">Vui lòng sử dụng WeChat để quét mã thanh toán</p>
                         </div>
                     @elseif($channel->type == 'bank')
                         <div class="bank-payment">
                             <div class="bank-info">
-                                <p>开户行：{{ $payment_data['bank_name'] }}</p>
-                                <p>账户名：{{ $payment_data['account_name'] }}</p>
-                                <p>账号：{{ $payment_data['account_number'] }}</p>
-                                <p>金额：{{ number_format($payment_data['amount'], 2) }} 元</p>
+                                <p>Ngân hàng mở tài khoản:{{ $payment_data['bank_name'] }}</p>
+                                <p>Tên tài khoản:{{ $payment_data['account_name'] }}</p>
+                                <p>Số tài khoản:{{ $payment_data['account_number'] }}</p>
+                                <p>Số tiền:{{ number_format($payment_data['amount'], 2) }} đồng</p>
                             </div>
                             <div class="alert alert-info">
-                                <p>请使用以上银行账户进行转账，转账时请备注订单号：{{ $order_no }}</p>
-                                <p>转账完成后，系统将自动确认到账</p>
+                                <p>Vui lòng sử dụng tài khoản ngân hàng trên để chuyển khoản, khi chuyển khoản vui lòng ghi chú mã đơn hàng:{{ $order_no }}</p>
+                                <p>Sau khi chuyển khoản thành công, hệ thống sẽ tự động xác nhận đã nhận được tiền</p>
                             </div>
                         </div>
                     @endif
@@ -44,11 +44,11 @@
                             <div class="progress-bar progress-bar-striped progress-bar-animated" 
                                 role="progressbar" style="width: 0%"></div>
                         </div>
-                        <p class="text-center mt-2" id="status-message">等待支付...</p>
+                        <p class="text-center mt-2" id="status-message">Đang chờ thanh toán...</p>
                     </div>
 
                     <div class="text-center mt-4">
-                        <a href="{{ route('payment.index') }}" class="btn btn-secondary">返回</a>
+                        <a href="{{ route('payment.index') }}" class="btn btn-secondary">Quay lại</a>
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
 $(document).ready(function() {
     const orderNo = '{{ $order_no }}';
     let checkCount = 0;
-    const maxChecks = 60; // 最多检查60次，即5分钟
+    const maxChecks = 60; // Check up to 60 times, i.e. 5 minutes
 
     @if($channel->type == 'alipay')
         new QRCode(document.getElementById("alipay-qrcode"), {
@@ -107,7 +107,7 @@ $(document).ready(function() {
 
     function checkPaymentStatus() {
         if (checkCount >= maxChecks) {
-            $('#status-message').text('支付超时，请重新发起支付');
+            $('#status-message').text('Thanh toán quá thời gian, vui lòng bắt đầu lại thanh toán');
             $('.progress-bar').css('width', '100%');
             return;
         }
@@ -120,27 +120,27 @@ $(document).ready(function() {
                     
                     $('#status-message').text(message);
                     
-                    if (status === 2) { // 支付成功
+                    if (status === 2) { // payment successful
                         $('.progress-bar').css('width', '100%');
                         setTimeout(function() {
                             window.location.href = '{{ route("payment.success") }}';
                         }, 1500);
                         return;
-                    } else if (status === 3) { // 支付失败
+                    } else if (status === 3) { // payment failed
                         $('.progress-bar').css('width', '100%');
                         return;
                     }
                     
-                    // 更新进度条
+                    // Update progress bar
                     const progress = (checkCount / maxChecks) * 100;
                     $('.progress-bar').css('width', progress + '%');
                     
                     checkCount++;
-                    setTimeout(checkPaymentStatus, 5000); // 每5秒检查一次
+                    setTimeout(checkPaymentStatus, 5000); // Check every 5 seconds
                 }
             })
             .fail(function() {
-                $('#status-message').text('检查支付状态失败，请刷新页面重试');
+                $('#status-message').text('Kiểm tra trạng thái thanh toán không thành công, vui lòng làm mới trang và thử lại');
             });
     }
 

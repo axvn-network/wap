@@ -16,7 +16,7 @@
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">欢迎您：{{Auth::user()->username}}，余额：{{Auth::user()->balance}} &nbsp; </span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Chào mừng bạn: {{Auth::user()->username}}, Số dư: {{Auth::user()->balance}} &nbsp; </span>
                 <img class="img-profile rounded-circle" src="/agent/img/tx.png">
               </a>
               <!-- Dropdown - User Information -->
@@ -24,13 +24,13 @@
                 
                 <a class="dropdown-item" href="{{url('/editPassword')}}">
                   <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                  修改密码
+                  Đổi mật khẩu
                 </a>
                
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  退出
+                  Thoát
                 </a>
               </div>
             </li>

@@ -5,29 +5,29 @@ namespace App\Services;
 class Zgpay
 {
 
-    public function __construct($merchant_id,$api_secret)
+    public function __construct($merchant_id, $api_secret)
     {
         $this->merchant_id = $merchant_id;
         $this->api_secret = $api_secret;
     }
 
-    public function withdraw($order_no,$amount,$username,$wallet_address)
+    public function withdraw($order_no, $amount, $username, $wallet_address)
     {
         $url = 'https://zgpay.cc/api/withdraw';
         $ch = curl_init($url);
 
         $merchant_id = $this->merchant_id;
-        //商户订单号
+        // Mã đơn hàng của đơn vị
         $out_trade_no = $order_no;
-        //提款金额
+        // Số tiền rút
         $total_fee = $amount;
-        // 用户账号
+        // Tên người dùng
         $user_name = $username;
-        // 用户钱包地址
+        // Địa chỉ ví của người dùng
         $user_wallet = $wallet_address;
-        //成功支付回调地址
-        $notify_url = env('APP_URL').'/zgp-withdraw-callback';
-        //商户密钥
+        // URL callback khi thanh toán thành công
+        $notify_url = env('APP_URL') . '/zgp-withdraw-callback';
+        // Khóa bí mật của đơn vị
         $api_secret = $this->api_secret;
 
         $sign = "";
@@ -64,7 +64,7 @@ class Zgpay
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        //Execute the request
+        // Thực thi yêu cầu
         $result = curl_exec($ch);
         curl_close($ch);
         return $result;

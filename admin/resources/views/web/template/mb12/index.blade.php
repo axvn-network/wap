@@ -1,1 +1,1 @@
-﻿请访问正确的地址！
+Vui lòng truy cập đúng địa chỉ!

@@ -73,9 +73,7 @@
               </a>
               <!-- Dropdown - Messages -->
               <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
-                <h6 class="dropdown-header">
-                  站内信
-                </h6>
+          <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ __('admin.inbox_mail') }}</span>
                 <a class="dropdown-item d-flex align-items-center" href="sitemail_detail.html">
                   <div class="dropdown-list-image mr-3">
                     <img class="rounded-circle" src="/agent/img/sms.png" alt="">
@@ -116,7 +114,7 @@
                     <div class="small text-gray-500">2020-08-18 00:00:00</div>
                   </div>
                 </a>
-                <a class="dropdown-item text-center small text-gray-500" href="/message">查看更多站内信</a>
+                <a class="dropdown-item text-center small text-gray-500" href="/message">{{ __('admin.view_more_inbox_mail') }}</a>
               </div>
             </li>
 

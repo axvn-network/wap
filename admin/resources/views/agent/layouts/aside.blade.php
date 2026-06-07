@@ -2,7 +2,7 @@
 
   <!-- Sidebar - Brand -->
   <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-    <div class="sidebar-brand-text mx-3">代理后台管理</div>
+    <div class="sidebar-brand-text mx-3">Quản trị đại lý</div>
   </a>
 
   <!-- Divider -->
@@ -12,7 +12,7 @@
   <li class="nav-item active">
     <a class="nav-link" href="/">
       <i class="fas fa-fw fa-tachometer-alt"></i>
-      <span>代理首页</span></a>
+      <span>{{ __('admin.agent_homepage') }}</span></a>
   </li>
 
   <!-- Divider -->
@@ -24,16 +24,16 @@
       <i class="fas fa-fw fa-cog">
       </i>
       <span>
-        首页内容
+        {{ __('admin.homepage_content') }}
       </span>
     </a>
     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <a class="collapse-item" href="{{url('/notice')}}">
-          公告信息
+          {{ __('admin.notice_information') }}
         </a>
         <a class="collapse-item" href="{{url('/message')}}">
-          站内信
+          {{ __('admin.inbox_mail') }}
         </a>
       </div>
     </div>
@@ -43,25 +43,25 @@
       <i class="fas fa-fw fa-cog">
       </i>
       <span>
-        代理概况
+        Tổng quan đại lý
       </span>
     </a>
     <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <a class="collapse-item" href="{{url('/chart')}}">
-          图表概况
+          {{ __('admin.chart_overview') }}
         </a>
         <a class="collapse-item" href="{{url('/today')}}">
-          今日概况
+          Tổng quan hôm nay
         </a>
         <a class="collapse-item" href="{{url('/profit')}}">
-          盈亏报表
+          Báo cáo lời lỗ
         </a>
           <a class="collapse-item" href="{{url('/commission')}}">
-              佣金报表
+              Báo cáo hoa hồng
           </a>
           <a class="collapse-item" href="{{url('/subordinate')}}">
-              下级代理佣金报表
+              Báo cáo hoa hồng đại lý cấp dưới
           </a>
 
       </div>
@@ -72,34 +72,34 @@
       <i class="fas fa-fw fa-cog">
       </i>
       <span>
-        代理页面
+        Trang đại lý
       </span>
     </a>
     <div id="collapseFour" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <a class="collapse-item" href="{{url('/add-member')}}">
-          添加下级会员
+          Thêm thành viên cấp dưới
         </a>
         <a class="collapse-item" href="{{url('/editPassword')}}">
-          修改密码
+          Đổi mật khẩu
         </a>
         <a class="collapse-item" href="{{url('/memberlist')}}">
-          下级会员列表
+          Danh sách thành viên cấp dưới
         </a>
         <a class="collapse-item" href="{{url('/bet-log')}}">
-          下级会员下注记录
+          Lịch sử đặt cược thành viên cấp dưới
         </a>
         <a href="{{url('/recharge-log')}}" class="collapse-item">
-          下级会员充值记录
+          Lịch sử nạp tiền thành viên cấp dưới
         </a>
         <a href="{{url('/withdraw-log')}}" class="collapse-item">
-          下级会员提现记录
+          Lịch sử rút tiền thành viên cấp dưới
         </a>
         <a href="{{url('/transfer-log')}}" class="collapse-item">
-          下级会员转账记录
+          Lịch sử chuyển khoản thành viên cấp dưới
         </a>
           <a href="{{url('/rebate')}}" class="collapse-item">
-              下级会员返水记录
+              Lịch sử hoàn trả thành viên cấp dưới
           </a>
 
 

@@ -3,25 +3,23 @@
 @section('content')
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary mb-4">
-            今日概况
-        </h6>
+    <h5>{{ __('admin.today_overview') }}</h5>
     </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>下级会员总数</th>
-                        <th>下级代理总数</th>
-                        <th>直属会员数</th>
-                        <th>下级直属代理数</th>
-                        <th>今日新增会员数</th>
-                        <th>今日总存款</th>
-                        <th>今日总提款</th>
-                        <th>今日投注</th>
-                        <th>今日有效投注</th>
-                        <th>今日输赢</th>
+                        <th>Tổng số hội viên cấp dưới</th>
+                        <th>Tổng số đại lý cấp dưới</th>
+                        <th>Số hội viên trực thuộc</th>
+                        <th>Số đại lý trực thuộc cấp dưới</th>
+                        <th>Số hội viên mới hôm nay</th>
+                        <th>Tổng nạp hôm nay</th>
+                        <th>Tổng rút hôm nay</th>
+                        <th>Cược hôm nay</th>
+                        <th>Cược hợp lệ hôm nay</th>
+                        <th>Thắng thua hôm nay</th>
                     </tr>
                 </thead>
 

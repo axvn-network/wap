@@ -9,28 +9,28 @@
                 <a class="d-flex justify-content-between" href="/{{ env('ADMIN_ROUTE_PREFIX') }}/recharge">
                     <div class="media d-flex align-items-start">
                         <div class="media-body">
-                            您有<span id="recharge"></span>条充值请求未处理
+                            Bạn có <span id="recharge"></span> yêu cầu nạp tiền chưa được xử lý
                         </div>
                     </div>
                 </a>
                 <a class="d-flex justify-content-between" href="/{{ env('ADMIN_ROUTE_PREFIX') }}/withdraws">
                     <div class="media d-flex align-items-start">
                         <div class="media-body">
-                            您有<span id="withdraw"></span>条提现请求未处理
+                            Bạn có <span id="withdraw"></span> yêu cầu rút tiền chưa được xử lý
                         </div>
                     </div>
                 </a>
                 <a class="d-flex justify-content-between" href="/{{ env('ADMIN_ROUTE_PREFIX') }}/agent-applys">
                     <div class="media d-flex align-items-start">
                         <div class="media-body">
-                            您有<span id="agent_apply"></span>条代理申请请求未处理
+                            Bạn có <span id="agent_apply"></span> yêu cầu đăng ký đại lý chưa được xử lý
                         </div>
                     </div>
                 </a>
                 <a class="d-flex justify-content-between" href="/{{ env('ADMIN_ROUTE_PREFIX') }}/activity-apply">
                     <div class="media d-flex align-items-start">
                         <div class="media-body">
-                            您有<span id="activity_apply"></span>条活动申请请求未处理
+                            Bạn có <span id="activity_apply"></span> yêu cầu đăng ký hoạt động chưa được xử lý
                         </div>
                     </div>
                 </a>

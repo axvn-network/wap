@@ -12,7 +12,8 @@ use Dcat\Admin\Http\Controllers\AdminController;
 
 class AgentApplyController extends AdminController
 {
-    protected $state = [1 => '待审核',2 => '通过',3 => '拒绝'];
+    protected $title = 'Duyệt đơn đăng ký đại lý';
+
     /**
      * Make a grid builder.
      *
@@ -20,23 +21,41 @@ class AgentApplyController extends AdminController
      */
     protected function grid()
     {
-        return Grid::make(new AgentApply(['user']), function (Grid $grid) {
+        return Grid::make(AgentApply::with(['user_data']), function (Grid $grid) {
             $grid->model()->orderBy('id', 'desc');
-            $grid->column('id')->sortable();
-            $grid->column('user.username','用户名');
-            $grid->column('apply_info');
-            $grid->column('state')->using($this->state);
-            $grid->column('created_at');
-            
-            $grid->disableCreateButton();
+
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('user_data.username', 'Tên người dùng');
+            $grid->column('username', 'Tên tài khoản');
+            $grid->column('mobile', 'Số điện thoại');
+            $grid->column('state', 'Trạng thái')->using([
+                1 => 'Đang chờ duyệt',
+                2 => 'Đã duyệt',
+                3 => 'Đã từ chối'
+            ])->dot([
+                1 => 'primary',
+                2 => 'success',
+                3 => 'danger'
+            ]);
+            $grid->column('remark', 'Ghi chú');
+            $grid->column('created_at', 'Thời gian đăng ký');
+
             $grid->filter(function (Grid\Filter $filter) {
-                $filter->equal('user.username','用户名');
-                $filter->between('created_at')->datetime();
+                $filter->equal('id');
+                $filter->like('user_data.username', 'Tên người dùng');
+                $filter->equal('state', 'Trạng thái')->select([
+                    1 => 'Đang chờ duyệt',
+                    2 => 'Đã duyệt',
+                    3 => 'Đã từ chối'
+                ]);
             });
+
+            $grid->disableCreateButton();
+            $grid->disableDeleteButton();
+
             $grid->actions(function (Grid\Displayers\Actions $actions) {
-                $actions->disableDelete();
                 $actions->disableEdit();
-                $actions->disableView();
+
                 if ($actions->row->state == 1) {
                     $actions->append(new Pass());
                     $actions->append(new Refuse());
@@ -56,11 +75,16 @@ class AgentApplyController extends AdminController
     {
         return Show::make($id, new AgentApply(), function (Show $show) {
             $show->field('id');
-            $show->field('user_id');
-            $show->field('apply_info');
-            $show->field('state');
-            $show->field('created_at');
-            $show->field('updated_at');
+            $show->field('username', 'Tên tài khoản');
+            $show->field('mobile', 'Số điện thoại');
+            $show->field('state', 'Trạng thái')->using([
+                1 => 'Đang chờ duyệt',
+                2 => 'Đã duyệt',
+                3 => 'Đã từ chối'
+            ]);
+            $show->field('remark', 'Ghi chú');
+            $show->field('created_at', 'Thời gian đăng ký');
+            $show->field('updated_at', 'Thời gian cập nhật');
         });
     }
 
@@ -72,13 +96,15 @@ class AgentApplyController extends AdminController
     protected function form()
     {
         return Form::make(new AgentApply(), function (Form $form) {
-            $form->display('id');
-            $form->text('user_id');
-            $form->text('apply_info');
-            $form->text('state');
-        
-            $form->display('created_at');
-            $form->display('updated_at');
+            $form->display('id', 'ID');
+            $form->display('username', 'Tên tài khoản');
+            $form->display('mobile', 'Số điện thoại');
+            $form->select('state', 'Trạng thái')->options([
+                1 => 'Đang chờ duyệt',
+                2 => 'Đã duyệt',
+                3 => 'Đã từ chối'
+            ]);
+            $form->textarea('remark', 'Ghi chú');
         });
     }
 }

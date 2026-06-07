@@ -7,7 +7,7 @@
                     <div class="card-header d-flex justify-content-between align-items-start pb-0">
                         <div>
                             <h4 class="card-title mb-1">
-                                Tickets
+                                Yêu cầu
                             </h4>
                             <div class="metric-header">
                             </div>
@@ -15,27 +15,27 @@
                         <div class="dropdown chart-dropdown">
                             <button class="btn btn-sm btn-light shadow-0 dropdown-toggle p-0 waves-effect"
                             data-toggle="dropdown">
-                                Last 7 Days
+                                7 ngày qua
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="7">
-                                        Last 7 Days
+                                        7 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="28">
-                                        Last 28 Days
+                                        28 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="30">
-                                        Last Month
+                                        Tháng trước
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="365">
-                                        Last Year
+                                        Năm trước
                                     </a>
                                 </li>
                             </div>
@@ -50,7 +50,7 @@
                                             162
                                         </h1>
                                         <small>
-                                            Tickets
+                                            Yêu cầu
                                         </small>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@
                                                                         y="138" text-anchor="middle" dominant-baseline="auto" font-size="16px"
                                                                         font-weight="400" fill="#586cb1" class="apexcharts-text apexcharts-datalabel-label"
                                                                         style="font-family: Helvetica, Arial, sans-serif;">
-                                                                            Completed Tickets
+                                                                            Yêu cầu đã hoàn thành
                                                                         </text>
                                                                         <text id="SvgjsText1182" font-family="Helvetica, Arial, sans-serif" x="138"
                                                                         y="184" text-anchor="middle" dominant-baseline="auto" font-size="2rem"
@@ -174,7 +174,7 @@
                                 <div class="d-flex justify-content-between p-1" style="padding-top: 0!important;">
                                     <div class="text-center">
                                         <p>
-                                            New Tickets
+                                            Yêu cầu mới
                                         </p>
                                         <span class="font-lg-1">
                                             29
@@ -182,7 +182,7 @@
                                     </div>
                                     <div class="text-center">
                                         <p>
-                                            Open Tickets
+                                            Yêu cầu đang mở
                                         </p>
                                         <span class="font-lg-1">
                                             63
@@ -190,10 +190,10 @@
                                     </div>
                                     <div class="text-center">
                                         <p>
-                                            Response Time
+                                            Thời gian phản hồi
                                         </p>
                                         <span class="font-lg-1">
-                                            1d
+                                            1 ngày
                                         </span>
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@
                     <div class="card-header d-flex justify-content-between align-items-start pb-0">
                         <div>
                             <h4 class="card-title mb-1">
-                                New Users
+                                Người dùng mới
                             </h4>
                             <div class="metric-header">
                             </div>
@@ -219,27 +219,27 @@
                         <div class="dropdown chart-dropdown">
                             <button class="btn btn-sm btn-light shadow-0 dropdown-toggle p-0 waves-effect"
                             data-toggle="dropdown">
-                                Last 7 Days
+                                7 ngày qua
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="7">
-                                        Last 7 Days
+                                        7 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="28">
-                                        Last 28 Days
+                                        28 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="30">
-                                        Last Month
+                                        Tháng trước
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="365">
-                                        Last Year
+                                        Năm trước
                                     </a>
                                 </li>
                             </div>
@@ -251,7 +251,7 @@
                                 89.2k
                             </h2>
                             <span class="mb-0 mr-1 text-80">
-                                New Users
+                                Người dùng mới
                             </span>
                         </div>
                         <div class="card-content" style="overflow: hidden; position: relative;">
@@ -404,13 +404,13 @@
                     <div class="card-header d-flex justify-content-between align-items-start pb-0">
                         <div>
                             <h4 class="card-title mb-1">
-                                New Devices
+                                Thiết bị mới
                             </h4>
                             <div class="metric-header">
                             </div>
                         </div>
                         <span class="btn btn-sm bg-light shadow-0 p-0">
-                            Last 30 days
+                            30 ngày qua
                         </span>
                     </div>
                     <div class="metric-content">
@@ -420,7 +420,7 @@
                                     <div style="width: 120px">
                                         <i class="fa fa-circle text-primary">
                                         </i>
-                                        Desktop
+                                        Máy tính để bàn
                                     </div>
                                     <div>
                                         44.9
@@ -430,7 +430,7 @@
                                     <div style="width: 120px">
                                         <i class="fa fa-circle" style="color: rgba(61, 151, 221, 0.5)">
                                         </i>
-                                        Mobile
+                                        Di động
                                     </div>
                                     <div>
                                         28.6
@@ -558,7 +558,7 @@
                     <div class="card-header d-flex justify-content-between align-items-start pb-0">
                         <div>
                             <h4 class="card-title mb-1">
-                                Avg Sessions
+                                Phiên trung bình
                             </h4>
                             <div class="metric-header">
                             </div>
@@ -566,27 +566,27 @@
                         <div class="dropdown chart-dropdown">
                             <button class="btn btn-sm btn-light shadow-0 dropdown-toggle p-0 waves-effect"
                             data-toggle="dropdown">
-                                Last 7 Days
+                                7 ngày qua
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="7">
-                                        Last 7 Days
+                                        7 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="28">
-                                        Last 28 Days
+                                        28 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="30">
-                                        Last Month
+                                        Tháng trước
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="365">
-                                        Last Year
+                                        Năm trước
                                     </a>
                                 </li>
                             </div>
@@ -606,12 +606,12 @@
                                                     +5.2%
                                                 </span>
                                                 <span>
-                                                    vs last 7 days
+                                                    so với 7 ngày trước
                                                 </span>
                                             </h5>
                                         </div>
                                         <a href="#" class="btn btn-primary shadow waves-effect waves-light">
-                                            View Details
+                                            Xem chi tiết
                                             <i class="feather icon-chevrons-right">
                                             </i>
                                         </a>
@@ -811,7 +811,7 @@
                     <div class="card-header d-flex justify-content-between align-items-start pb-0">
                         <div>
                             <h4 class="card-title mb-1">
-                                Product Orders
+                                Đơn hàng sản phẩm
                             </h4>
                             <div class="metric-header">
                             </div>
@@ -819,27 +819,27 @@
                         <div class="dropdown chart-dropdown">
                             <button class="btn btn-sm btn-light shadow-0 dropdown-toggle p-0 waves-effect"
                             data-toggle="dropdown">
-                                Last 7 Days
+                                7 ngày qua
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="7">
-                                        Last 7 Days
+                                        7 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="28">
-                                        Last 28 Days
+                                        28 ngày qua
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="30">
-                                        Last Month
+                                        Tháng trước
                                     </a>
                                 </li>
                                 <li class="dropdown-item">
                                     <a href="javascript:void(0)" class="select-option" data-option="365">
-                                        Last Year
+                                        Năm trước
                                     </a>
                                 </li>
                             </div>
@@ -855,7 +855,7 @@
                                                 <i class="fa fa-circle-o text-bold-700 text-primary">
                                                 </i>
                                                 <span class="text-bold-600 ml-50">
-                                                    Finished
+                                                    Hoàn thành
                                                 </span>
                                             </div>
                                             <div class="product-result">
@@ -869,7 +869,7 @@
                                                 <i class="fa fa-circle-o text-bold-700 text-warning">
                                                 </i>
                                                 <span class="text-bold-600 ml-50">
-                                                    Pending
+                                                    Đang chờ
                                                 </span>
                                             </div>
                                             <div class="product-result">
@@ -883,7 +883,7 @@
                                                 <i class="fa fa-circle-o text-bold-700 text-danger">
                                                 </i>
                                                 <span class="text-bold-600 ml-50">
-                                                    Rejected
+                                                    Bị từ chối
                                                 </span>
                                             </div>
                                             <div class="product-result">
@@ -985,7 +985,7 @@
                                                                         <text id="SvgjsText1334" font-family="Helvetica, Arial, sans-serif" x="93"
                                                                         y="91" text-anchor="middle" dominant-baseline="auto" font-size="16px" font-weight="600"
                                                                         fill="#373d3f" class="apexcharts-text apexcharts-datalabel-label" style="font-family: Helvetica, Arial, sans-serif;">
-                                                                            Total
+                                                                            Tổng
                                                                         </text>
                                                                         <text id="SvgjsText1335" font-family="Helvetica, Arial, sans-serif" x="93"
                                                                         y="113" text-anchor="middle" dominant-baseline="auto" font-size="12px"

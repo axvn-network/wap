@@ -10,6 +10,8 @@ use Dcat\Admin\Http\Controllers\AdminController;
 
 class ActivityTypeController extends AdminController
 {
+    protected $title = 'Loại hoạt động';
+
     /**
      * Make a grid builder.
      *
@@ -18,17 +20,13 @@ class ActivityTypeController extends AdminController
     protected function grid()
     {
         return Grid::make(new ActivityType(), function (Grid $grid) {
-            $grid->column('id')->sortable();
-            $grid->column('name');
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('title', 'Tiêu đề');
             $grid->column('created_at');
-            $grid->actions(function (Grid\Displayers\Actions $actions) {
-                $actions->disableView();
-            });
-            // $grid->column('updated_at')->sortable();
-        
+            $grid->column('updated_at')->sortable();
+
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->equal('id');
-        
             });
         });
     }
@@ -44,8 +42,7 @@ class ActivityTypeController extends AdminController
     {
         return Show::make($id, new ActivityType(), function (Show $show) {
             $show->field('id');
-            $show->field('name');
-            $show->field('state');
+            $show->field('title', 'Tiêu đề');
             $show->field('created_at');
             $show->field('updated_at');
         });
@@ -60,7 +57,8 @@ class ActivityTypeController extends AdminController
     {
         return Form::make(new ActivityType(), function (Form $form) {
             $form->display('id');
-            $form->text('name');
+            $form->text('title', 'Tiêu đề');
+
             $form->display('created_at');
             $form->display('updated_at');
         });

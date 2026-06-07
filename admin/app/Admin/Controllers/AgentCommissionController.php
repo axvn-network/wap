@@ -2,19 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Repositories\User;
+use App\Admin\Repositories\AgentCommission;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Dcat\Admin\Http\Controllers\AdminController;
-use Illuminate\Support\Facades\Hash;
-use App\Admin\Actions\Grid\User\Fanyong;
-use App\Admin\Tools\AgentFanyong;
-
 
 class AgentCommissionController extends AdminController
 {
-    protected $title = '代理佣金报表';
+    protected $title = 'Chi tiết hoa hồng đại lý';
+
     /**
      * Make a grid builder.
      *
@@ -22,38 +19,75 @@ class AgentCommissionController extends AdminController
      */
     protected function grid()
     {
-        return Grid::make(new User(), function (Grid $grid) {
-            $grid->model()->where('isagent',1);
-            // $grid->column('id')->sortable();
-            $grid->column('username');
-            //$grid->column('结算方案');
-            $grid->column('child_count','有效会员数')->display(function (){
-                return $this->agentbetTimes();
-            });
-            $grid->column('bet_sum','总有效投注')->display(function (){
-                return $this->agentbetSum();
-            });
-            $grid->column('valid_bet_sum','总盈利')->display(function (){
-                return $this->agentvaildBetSum();
-            });
-            $grid->column('win_loss','总获返利')->display(function (){
-                return $this->agentwinLoss();
-            });
-            // $grid->disableActions();
-            $grid->actions(function (Grid\Displayers\Actions $actions) {
-                $actions->append(new Fanyong());
-                $actions->disableDelete();
-                $actions->disableView();
-                $actions->disableEdit();
-            });
-            $grid->disableCreateButton();
+        return Grid::make(new AgentCommission(), function (Grid $grid) {
+            $grid->model()->orderBy('id', 'desc');
+
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('user_id', 'ID Người dùng');
+            $grid->column('order_id', 'ID Đơn hàng');
+            $grid->column('son_user_id', 'ID thành viên cấp dưới');
+            $grid->column('son_username', 'Tên người dùng cấp dưới');
+            $grid->column('level', 'Cấp');
+            $grid->column('rate', 'Tỷ lệ');
+            $grid->column('fee', 'Phí');
+            $grid->column('money', 'Số tiền');
+            $grid->column('created_at', 'Thời gian tạo');
+
             $grid->filter(function (Grid\Filter $filter) {
-                $filter->equal('id');
-                $filter->equal('username');
+                $filter->equal('user_id', 'ID Người dùng');
+                $filter->equal('son_user_id', 'ID thành viên cấp dưới');
             });
-            $grid->tools(new AgentFanyong());
+
+            $grid->disableCreateButton();
+            $grid->disableDeleteButton();
+            $grid->disableEditButton();
         });
     }
-    
 
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     *
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        return Show::make($id, new AgentCommission(), function (Show $show) {
+            $show->field('id');
+            $show->field('user_id', 'ID Người dùng');
+            $show->field('order_id', 'ID Đơn hàng');
+            $show->field('son_user_id', 'ID thành viên cấp dưới');
+            $show->field('son_username', 'Tên người dùng cấp dưới');
+            $show->field('level', 'Cấp');
+            $show->field('rate', 'Tỷ lệ');
+            $show->field('fee', 'Phí');
+            $show->field('money', 'Số tiền');
+            $show->field('created_at');
+            $show->field('updated_at');
+        });
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        return Form::make(new AgentCommission(), function (Form $form) {
+            $form->display('id');
+            $form->display('user_id');
+            $form->display('order_id');
+            $form->display('son_user_id');
+            $form->display('son_username');
+            $form->display('level');
+            $form->display('rate');
+            $form->display('fee');
+            $form->display('money');
+
+            $form->display('created_at');
+            $form->display('updated_at');
+        });
+    }
 }

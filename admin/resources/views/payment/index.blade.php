@@ -5,13 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">选择支付方式</div>
+                <div class="card-header">Chọn phương thức thanh toán</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('payment.create') }}" id="paymentForm">
                         @csrf
                         <div class="form-group">
-                            <label for="amount">充值金额</label>
+                            <label for="amount">Số tiền nạp</label>
                             <input type="number" class="form-control @error('amount') is-invalid @enderror" 
                                 id="amount" name="amount" value="{{ old('amount') }}" step="0.01" required>
                             @error('amount')
@@ -40,7 +40,7 @@
 
                         <div class="form-group mt-4">
                             <button type="submit" class="btn btn-primary btn-block">
-                                确认支付
+                                Xác nhận thanh toán
                             </button>
                         </div>
                     </form>
@@ -111,7 +111,7 @@ $(document).ready(function() {
         const channelId = $('input[name="channel_id"]:checked').val();
         
         if (!amount || !channelId) {
-            alert('请选择支付金额和支付方式');
+            alert('Vui lòng chọn số tiền thanh toán và phương thức thanh toán');
             return;
         }
         

@@ -10,8 +10,8 @@ use Dcat\Admin\Http\Controllers\AdminController;
 
 class ActivityController extends AdminController
 {
+    protected $title = 'Quản lý hoạt động';
 
-    protected $type = [1 => '充值赠送'];
     /**
      * Make a grid builder.
      *
@@ -19,25 +19,20 @@ class ActivityController extends AdminController
      */
     protected function grid()
     {
-        return Grid::make(Activity::with(['type_data']), function (Grid $grid) {
+        return Grid::make(new Activity(), function (Grid $grid) {
             $grid->model()->orderBy('id', 'desc');
-            $grid->column('id')->sortable();
-            
-            $grid->column('type_data.name','活动类型');
-            $grid->column('title');
-            $grid->column('entitle');
-            //$grid->column('content');
-            $grid->column('apply_count');
-            //$grid->column('banner');
-            $grid->column('can_apply')->using([1 => '可申请',0 => '不可申请']);
-            $grid->column('state')->using([1 => '正常',0 => '禁用']);
-            $grid->column('created_at');
-            // $grid->column('updated_at')->sortable();
 
-            $grid->filter(function (Grid\Filter $filter) {
-                $filter->equal('id');
-
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('title', 'Tiêu đề');
+            $grid->column('start_time', 'Thời gian bắt đầu')->display(function ($startTime) {
+                return date('Y-m-d H:i:s', $startTime);
             });
+            $grid->column('end_time', 'Thời gian kết thúc')->display(function ($endTime) {
+                return date('Y-m-d H:i:s', $endTime);
+            });
+            $grid->column('status', 'Trạng thái')->switch();
+            $grid->column('is_top', 'Ghim')->switch();
+            $grid->column('created_at');
         });
     }
 
@@ -52,14 +47,11 @@ class ActivityController extends AdminController
     {
         return Show::make($id, new Activity(), function (Show $show) {
             $show->field('id');
-            $show->field('type');
-            $show->field('title');
-            $show->field('entitle');
-            $show->field('content');
-            $show->field('apply_count');
-            $show->field('banner')->image();
-            $show->field('can_apply');
-            $show->field('state');
+            $show->field('title', 'Tiêu đề');
+            $show->field('content', 'Nội dung');
+            $show->field('start_time', 'Thời gian bắt đầu');
+            $show->field('end_time', 'Thời gian kết thúc');
+            $show->field('status', 'Trạng thái');
             $show->field('created_at');
             $show->field('updated_at');
         });
@@ -74,24 +66,12 @@ class ActivityController extends AdminController
     {
         return Form::make(new Activity(), function (Form $form) {
             $form->display('id');
-            
-            $settlements = \App\Models\ActivityType::where('state', 1)->get();
-            $options = [];
-            foreach ($settlements as $k => $v) {
-                $options[$v->id] = $v->name;
-            }
-            
-            $form->select('type')->options($options)->required();
-            $form->text('title')->required();
-            $form->text('entitle')->required();
-            $form->editor('content')->required();
-            $form->editor('encontent')->required();
-            $form->editor('memo','活动条款与规则')->required();
-            $form->editor('enmemo','活动条款与规则')->required();
-            $form->number('apply_count');
-            $form->image('banner')->uniqueName()->retainable();
-            $form->radio('can_apply')->options([1 => '可申请',0 => '不可申请'])->default(1);
-            $form->radio('state')->options([1 => '正常',0 => '禁用'])->default(1);
+            $form->text('title', 'Tiêu đề')->required();
+            $form->datetime('start_time', 'Thời gian bắt đầu')->required();
+            $form->datetime('end_time', 'Thời gian kết thúc')->required();
+            $form->switch('status', 'Trạng thái')->default(1);
+            $form->switch('is_top', 'Ghim')->default(0);
+            $form->editor('content', 'Nội dung');
 
             $form->display('created_at');
             $form->display('updated_at');

@@ -3,62 +3,61 @@
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h5>添加下级会员</h5>
+    <h5>Thêm thành viên cấp dưới</h5>
 </div>
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">注册会员资料</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Thông tin đăng ký thành viên</h6>
     </div>
     <form class="user" action="/add-member" method="post" onsubmit="return checkForm()">
         @csrf
         <div class="modal-body" style="padding-top:35px;">
             <div class="form-group row">
                 <div class="col-sm-6a">
-                    账号：
+                    Tài khoản:
                 </div>
                 <div class="col-sm-6b">
-                    <input type="text" name="username" class="form-control form-control-user" placeholder="* 请输入长度6-9位,可输入英文字母 或数字" required minlength="6">
+                    <input type="text" name="username" class="form-control form-control-user" placeholder="* Vui lòng nhập độ dài 6-9 ký tự, có thể nhập chữ cái hoặc số" required minlength="6">
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-sm-6a">
-                    密码：
+                    Mật khẩu:
                 </div>
                 <div class="col-sm-6b">
-                    <input type="password" id="password" name="password" class="form-control form-control-user" placeholder="* 密码规则:须为6-24位英 文或数字的字符" required minlength="6">
+                    <input type="password" id="password" name="password" class="form-control form-control-user" placeholder="* Quy tắc mật khẩu: phải là ký tự chữ hoặc số dài 6-24" required minlength="6">
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-sm-6a">
-                    确认密码：
+                    Xác nhận mật khẩu:
                 </div>
                 <div class="col-sm-6b">
-                    <input type="password" id="repassword" class="form-control form-control-user" placeholder="* 请再次输入密码" required>
+                    <input type="password" id="repassword" class="form-control form-control-user" placeholder="* Vui lòng nhập lại mật khẩu" required>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-sm-6a">
-                    真实姓名：
+                    Tên thật:
                 </div>
                 <div class="col-sm-6b">
-                    <input type="text" name="realname" class="form-control form-control-user" placeholder="* 请输入中文姓名" required>
+                    <input type="text" name="realname" class="form-control form-control-user" placeholder="* Vui lòng nhập họ và tên" required>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-sm-6a">
-                    取款密码：
+                    Mật khẩu rút tiền:
                 </div>
                 <div class="col-sm-6b" style="padding-top:15px;">
-                    * 默认取款密码为<font color="#f00">【123456】</font>会员登录后可自行更改，请务必记住！
-
+                    * Mật khẩu rút tiền mặc định là <font color="#f00">【123456】</font>, thành viên có thể tự thay đổi sau khi đăng nhập, hãy nhớ kỹ!
                 </div>
             </div>
             <div class="form-group row" style="padding-top:15px;">
                 <div class="col-sm-6a"></div>
                 <div class="col-sm-6b">
                     <button type="submit" class="btn btn-google btn-user btn-block">
-                        立即注册
+                        Đăng ký ngay
                     </button>
                 </div>
             </div>
@@ -78,7 +77,7 @@ function checkForm() {
     var password = $('#password').val();
     var repassword = $('#repassword').val();
     if (password != repassword) {
-        alert('两次密码输入不一致');
+        alert('Hai mật khẩu không khớp');
         return false;
     }
 }

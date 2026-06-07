@@ -2,17 +2,18 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Grid\Activity\Pass;
+use App\Admin\Actions\Grid\Activity\Refuse;
 use App\Admin\Repositories\ActivityApply;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Dcat\Admin\Http\Controllers\AdminController;
-use App\Admin\Actions\Grid\Activity;
 
 class ActivityApplyController extends AdminController
 {
+    protected $title = 'Duyệt đơn đăng ký hoạt động';
 
-    protected $state = [1 => '待审核',2 => '通过',3 => '拒绝'];
     /**
      * Make a grid builder.
      *
@@ -20,28 +21,42 @@ class ActivityApplyController extends AdminController
      */
     protected function grid()
     {
-        return Grid::make(ActivityApply::with(['activity_data','user_data']), function (Grid $grid) {
-            $grid->column('id')->sortable();
-            $grid->column('activity_data.title','活动名称');
-            $grid->column('user_data.username','申请人');
-            $grid->column('state')->using($this->state);
-            $grid->column('check_time');
-            $grid->column('created_at');
-            // $grid->column('updated_at')->sortable();
-        
+        return Grid::make(ActivityApply::with(['user_data', 'activity_data']), function (Grid $grid) {
+            $grid->model()->orderBy('id', 'desc');
+
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('user_data.username', 'Tên người dùng');
+            $grid->column('activity_data.title', 'Tên hoạt động');
+            $grid->column('state', 'Trạng thái')->using([
+                1 => 'Đang chờ duyệt',
+                2 => 'Đã duyệt',
+                3 => 'Đã từ chối'
+            ])->dot([
+                1 => 'primary',
+                2 => 'success',
+                3 => 'danger'
+            ]);
+            $grid->column('remark', 'Ghi chú của quản trị viên');
+            $grid->column('created_at', 'Thời gian đăng ký');
+
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->equal('id');
-        
+                $filter->like('user_data.username', 'Tên người dùng');
+                $filter->equal('state', 'Trạng thái')->select([
+                    1 => 'Đang chờ duyệt',
+                    2 => 'Đã duyệt',
+                    3 => 'Đã từ chối'
+                ]);
             });
 
             $grid->disableCreateButton();
+            $grid->disableEditButton();
+            $grid->disableDeleteButton();
+
             $grid->actions(function (Grid\Displayers\Actions $actions) {
-                $actions->disableDelete();
-                $actions->disableEdit();
-                $actions->disableView();
                 if ($actions->row->state == 1) {
-                    $actions->append(new Activity\Pass());
-                    $actions->append(new Activity\Refuse());
+                    $actions->append(new Pass());
+                    $actions->append(new Refuse());
                 }
             });
         });
@@ -56,14 +71,18 @@ class ActivityApplyController extends AdminController
      */
     protected function detail($id)
     {
-        return Show::make($id, new ActivityApply(), function (Show $show) {
+        return Show::make($id, ActivityApply::with(['user_data', 'activity_data']), function (Show $show) {
             $show->field('id');
-            $show->field('activity_id');
-            $show->field('user_id');
-            $show->field('state');
-            $show->field('check_time');
-            $show->field('created_at');
-            $show->field('updated_at');
+            $show->field('user_data.username', 'Tên người dùng');
+            $show->field('activity_data.title', 'Tên hoạt động');
+            $show->field('state', 'Trạng thái')->using([
+                1 => 'Đang chờ duyệt',
+                2 => 'Đã duyệt',
+                3 => 'Đã từ chối'
+            ]);
+            $show->field('remark', 'Ghi chú của quản trị viên');
+            $show->field('created_at', 'Thời gian đăng ký');
+            $show->field('updated_at', 'Thời gian cập nhật');
         });
     }
 
@@ -76,13 +95,16 @@ class ActivityApplyController extends AdminController
     {
         return Form::make(new ActivityApply(), function (Form $form) {
             $form->display('id');
-            $form->text('activity_id');
-            $form->text('user_id');
-            $form->text('state');
-            $form->text('check_time');
-        
-            $form->display('created_at');
-            $form->display('updated_at');
+            $form->display('uid', 'ID Người dùng');
+            $form->display('activityid', 'ID Hoạt động');
+            $form->display('state', 'Trạng thái')->with(function ($value) {
+                $states = [1 => 'Đang chờ duyệt', 2 => 'Đã duyệt', 3 => 'Đã từ chối'];
+                return $states[$value] ?? 'Không xác định';
+            });
+            $form->textarea('remark', 'Ghi chú của quản trị viên');
+
+            $form->disableDeleteButton();
+            $form->disableViewButton();
         });
     }
 }

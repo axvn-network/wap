@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>代理后台管理</title>
+  <title>Quản trị đại lý</title>
 
   <!-- Custom fonts for this template-->
   <link href="/agent/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -52,7 +52,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
-                        基本资料
+                        Thông tin cơ bản
                     </h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">
@@ -64,7 +64,7 @@
                     <div class="modal-body">
                         <div class="form-group row">
                             <div class="col-sm-6a">
-                                账号：
+                                Tài khoản：
                             </div>
                             <div class="col-sm-6b">
                                 <input type="text" class="form-control form-control-user" disabled=""
@@ -73,7 +73,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-6a">
-                                姓名：
+                                Họ và tên：
                             </div>
                             <div class="col-sm-6b">
                                 <input type="text" class="form-control form-control-user" disabled=""
@@ -82,7 +82,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-6a">
-                                额度：
+                                Hạn mức：
                             </div>
                             <div class="col-sm-6b">
                                 <input type="text" class="form-control form-control-user" disabled=""
@@ -93,7 +93,7 @@
                 </form>
                 <div class="modal-footer">
                     <button class="btn btn-primary" type="button" data-dismiss="modal">
-                        关闭
+                        Đóng
                     </button>
                 </div>
             </div>
@@ -106,7 +106,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
-                        友情提示
+                        Lời nhắc
                     </h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">
@@ -115,14 +115,14 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    您确定要退出代理后台管理系统?
+                    Bạn có chắc chắn muốn thoát khỏi hệ thống quản lý đại lý?
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">
-                        取消
+                        Hủy
                     </button>
                     <a class="btn btn-primary" href="{{url('/logout')}}">
-                        退出
+                        Thoát
                     </a>
                 </div>
             </div>
@@ -150,13 +150,13 @@
         <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title" id="exampleModalCenterTitle">提示</h6>
+                    <h6 class="modal-title" id="exampleModalCenterTitle">Thông báo</h6>
                 </div>
                 <div class="modal-body">
                     {{ session('opMsg') }}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>

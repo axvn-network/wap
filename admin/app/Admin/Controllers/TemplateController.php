@@ -21,46 +21,46 @@ class TemplateController extends AdminController
     public function index(Content $content)
     {
         return $content
-            ->header('模板管理')
+            ->header('Quản lý Giao diện')
             ->description('')
             ->body(function (Row $row) {
                 $row->column(12, function (Column $column) {
-                    $column->row('<a class="btn btn-sm btn-light shadow-none" href="/admin/templates/create">新增</a>');
+                    $column->row('<a class="btn btn-sm btn-light shadow-none" href="/admin/templates/create">Thêm mới</a>');
                 });
 
                 $row->column(12, function (Column $column) {
-                    $column->row('<br><span>正在使用</span>');
+                    $column->row('<br><span>Đang sử dụng</span>');
                 });
                 $list = ModelsTemplate::where('state',2)->orderBy('sort','desc')->get();
                 foreach ($list as $k => $v) {
                     $row->column(6, function (Column $column) use ($v) {
-                        // 标题和内容
+                        // Tiêu đề và nội dung
                         $card = Card::make($v->name.'-'.$this->type[$v->client_type], "<img src='/uploads/$v->pic' width='300px;' height='400px;'>");
     
-                        // 设置工具按钮
-                        // $card->tool('<button class="btn btn-sm btn-light shadow-none">按钮</button>');
+                        // Thiết lập nút công cụ
+                        // $card->tool('<button class="btn btn-sm btn-light shadow-none">Nút</button>');
     
-                        // 设置底部内容
-                        $card->footer('模板路径:'.$v->template_id);
+                        // Thiết lập nội dung chân trang
+                        $card->footer('Đường dẫn giao diện:'.$v->template_id);
                         $column->row($card);
                     });
                 }
                 
 
                 $row->column(12, function (Column $column) {
-                    $column->row('<br><span>其它模板</span>');
+                    $column->row('<br><span>Giao diện khác</span>');
                 });
                 $list = ModelsTemplate::where('state','<>',2)->orderBy('sort','desc')->get();
                 foreach ($list as $k => $v) {
                     $row->column(6, function (Column $column) use ($v) {
-                        // 标题和内容
+                        // Tiêu đề và nội dung
                         $card = Card::make($v->name.'-'.$this->type[$v->client_type], "<img src='/uploads/$v->pic' width='300px;' height='400px;'>");
     
-                        // 设置工具按钮
-                        $card->tool("<a href='/admin/setDefaultTemplate/$v->id/$v->client_type' class='btn btn-sm btn-light shadow-none'>设为默认</a>");
+                        // Thiết lập nút công cụ
+                        $card->tool("<a href='/admin/setDefaultTemplate/$v->id/$v->client_type' class='btn btn-sm btn-light shadow-none'>Đặt làm mặc định</a>");
     
-                        // 设置底部内容
-                        $card->footer('模板路径:'.$v->template_id);
+                        // Thiết lập nội dung chân trang
+                        $card->footer('Đường dẫn giao diện:'.$v->template_id);
                         $column->row($card);
                     });
                 }
@@ -128,7 +128,7 @@ class TemplateController extends AdminController
             $form->radio('client_type')->options($this->type)->default(1);
             $form->number('sort');
             $form->text('template_id')->required();
-            $form->radio('state')->options([1 => '可用',0 => '禁用',2 => '正在使用'])->default(1);
+            $form->radio('state')->options([1 => 'Có thể dùng', 0 => 'Vô hiệu hóa', 2 => 'Đang sử dụng'])->default(1);
 
             $form->saving(function (Form $form) {
                 if ($form->state == 2) {
@@ -145,7 +145,7 @@ class TemplateController extends AdminController
     {
         ModelsTemplate::where('client_type',$type)->where('state','2')->update(['state' => 1]);
         $res = ModelsTemplate::where('id',$id)->update(['state' => 2]);
-        admin_success('设置成功');
+        admin_success('Thiết lập thành công');
         return redirect('/admin/templates');
     }
 }

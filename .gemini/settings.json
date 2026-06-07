@@ -1,0 +1,6 @@
+{
+  "general": {
+    "debugKeystrokeLogging": true,
+    "logRagSnippets": true
+  }
+}

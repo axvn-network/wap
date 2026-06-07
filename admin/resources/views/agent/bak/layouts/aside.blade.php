@@ -12,7 +12,7 @@
   <li class="nav-item active">
     <a class="nav-link" href="/">
       <i class="fas fa-fw fa-tachometer-alt"></i>
-      <span>代理首页</span></a>
+      <span>{{ __('admin.agent_homepage') }}</span></a>
   </li>
 
   <!-- Divider -->
@@ -24,16 +24,16 @@
       <i class="fas fa-fw fa-cog">
       </i>
       <span>
-        首页内容
+        {{ __('admin.homepage_content') }}
       </span>
     </a>
     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <a class="collapse-item" href="{{url('/notice')}}">
-          公告信息
+          {{ __('admin.notice_information') }}
         </a>
         <a class="collapse-item" href="{{url('/message')}}">
-          站内信
+          {{ __('admin.inbox_mail') }}
         </a>
       </div>
     </div>
@@ -49,7 +49,7 @@
     <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <a class="collapse-item" href="{{url('/chart')}}">
-          图表概况
+          {{ __('admin.chart_overview') }}
         </a>
         <a class="collapse-item" href="{{url('/today')}}">
           今日概况

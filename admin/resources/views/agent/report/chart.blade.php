@@ -2,7 +2,7 @@
 
 @section('content')
 <!-- Page Heading -->
-<h5>图表统计</h1>
+<h5>Thống kê biểu đồ</h1>
     <p class="mb-4"></p>
 
     <!-- Content Row -->
@@ -13,17 +13,17 @@
             <!-- Area Chart -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">下级会员资金存取数据汇总</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Tổng hợp dữ liệu nạp và rút tiền của thành viên cấp dưới</h6>
                 </div>
                 <div class="card-body">
                     <div class="mt-4a text-center small">
                         <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> 存款
+                            <i class="fas fa-circle text-primary"></i> Nạp tiền
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-warning"></i> 提款
+                            <i class="fas fa-circle text-warning"></i> Rút tiền
                         </span>
-                        <span class="mr-2">刷新时间：{{date('Y-m-d H:i:s')}}</span>
+                        <span class="mr-2">Thời gian làm mới：{{date('Y-m-d H:i:s')}}</span>
                     </div>
                     <div class="chart-area">
                         <canvas id="myAreaChart"></canvas>
@@ -35,17 +35,17 @@
             <!-- Area Chart -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">盈亏报表统计</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Thống kê báo cáo lãi lỗ</h6>
                 </div>
                 <div class="card-body">
                     <div class="mt-4a text-center small">
                         <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> 存款
+                            <i class="fas fa-circle text-primary"></i> Nạp tiền
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-warning"></i> 提款
+                            <i class="fas fa-circle text-warning"></i> Rút tiền
                         </span>
-                        <span class="mr-2">刷新时间：{{date('Y-m-d H:i:s')}}</span>
+                        <span class="mr-2">Thời gian làm mới：{{date('Y-m-d H:i:s')}}</span>
                     </div>
                     <div class="chart-area">
                         <canvas id="myAreaChart2"></canvas>
@@ -62,12 +62,12 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">下级会员存取总金额比例</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Tỷ lệ tổng số tiền gửi và rút của thành viên cấp dưới</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="mt-4a text-center small">
-                        <span class="mr-2">刷新时间：{{date('Y-m-d H:i:s')}}</span>
+                        <span class="mr-2">Thời gian làm mới：{{date('Y-m-d H:i:s')}}</span>
                     </div>
                     <div class="chart-pie pt-4">
                         <canvas id="myPieChart"></canvas>
@@ -76,13 +76,13 @@
                     <hr>
                     <div class="mt-4 text-center small">
                         <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> 利润
+                            <i class="fas fa-circle text-primary"></i> Lợi nhuận
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> 总支出
+                            <i class="fas fa-circle text-success"></i> Tổng chi
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> 总收入
+                            <i class="fas fa-circle text-info"></i> Tổng thu nhập
                         </span>
                     </div>
                 </div>

@@ -4,14 +4,14 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary mb-4">
-        盈亏报表
+        Báo cáo lợi nhuận
         </h6>
         <div class="input-group" style="z-index:999; padding-left:0; padding-bottom:20px;">
             <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="{{url('/profit')}}" method="get">
                 <div class="input-group">
-                    <input type="text" class="form-control border-0 small" placeholder="请选择开始时间" id="start1" name="start" value="{{$start}}">&nbsp;&nbsp;
-                    <input type="text" class="form-control border-0 small" placeholder="请选择结束时间" id="end1" name="end" value="{{$end}}">&nbsp;&nbsp;
-                    <input type="text" class="form-control border-0 small" name="username" placeholder="请输入用户名..." aria-label="Search" aria-describedby="basic-addon2" value="{{$username}}">
+                    <input type="text" class="form-control border-0 small" placeholder="Vui lòng chọn thời gian bắt đầu" id="start1" name="start" value="{{$start}}">&nbsp;&nbsp;
+                    <input type="text" class="form-control border-0 small" placeholder="Vui lòng chọn thời gian kết thúc" id="end1" name="end" value="{{$end}}">&nbsp;&nbsp;
+                    <input type="text" class="form-control border-0 small" name="username" placeholder="Vui lòng nhập tên người dùng..." aria-label="Search" aria-describedby="basic-addon2" value="{{$username}}">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-search fa-sm">
@@ -27,16 +27,16 @@
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>账号</th>
-                        <th>姓名</th>
-                        <th>上级</th>
-                        <th>账户类型</th>
-                        <th>存款次</th>
-                        <th>提款次</th>
-                        <th>总存款</th>
-                        <th>总提款</th>
-                        <th>总有效投注</th>
-                        <th>总输赢</th>
+                        <th>Tài khoản</th>
+                        <th>Họ và tên</th>
+                        <th>Cấp trên</th>
+                        <th>Loại tài khoản</th>
+                        <th>Số lần nạp</th>
+                        <th>Số lần rút</th>
+                        <th>Tổng nạp</th>
+                        <th>Tổng rút</th>
+                        <th>Tổng cược hợp lệ</th>
+                        <th>Tổng thắng thua</th>
                     </tr>
                 </thead>
 
@@ -46,7 +46,7 @@
                         <td>{{$item->username}}</td>
                         <td>{{$item->realname}}</td>
                         <td>{{$item->getAgentData()->username}}</td>
-                        <td>{{$item->is_agent == 1 ? '代理' : '会员'}}</td>
+                        <td>{{$item->is_agent == 1 ? 'Đại lý' : 'Hội viên'}}</td>
                         <td>{{$item->rechage_times}}</td>
                         <td>{{$item->withdraw_times}}</td>
                         <td>{{$item->all_recharge}}</td>
@@ -77,13 +77,13 @@
 <script>
     lay('#version').html('-v' + laydate.v);
 
-    //执行一个laydate实例
+    //Thực hiện một phiên bản laydate
     laydate.render({
-        elem: '#start1' //指定元素
+        elem: '#start1' //Chỉ định phần tử
     });
 
     laydate.render({
-        elem: '#end1' //指定元素
+        elem: '#end1' //Chỉ định phần tử
     });
 </script>
 @endsection

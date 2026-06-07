@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h5>公告信息</h5>
+    <h5>{{ __('admin.notice_information') }}</h5>
 </div>
 
 <!-- DataTales Example -->

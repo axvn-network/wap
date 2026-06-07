@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\PaymentChannel;
-use App\Services\PaymentService;
+use App\Models\Recharge;
+use App\Services\PaymentServiceFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -27,19 +29,19 @@ class PaymentController extends Controller
         ]);
 
         $channel = PaymentChannel::findOrFail($request->channel_id);
-        
+
         if (!$channel->isAvailable()) {
-            return back()->with('error', '该支付渠道暂时不可用');
+            return back()->with('error', trans('payment.channel_unavailable'));
         }
 
         if (!$channel->validateAmount($request->amount)) {
-            return back()->with('error', sprintf('请输入金额在%.2f-%.2f之间！', 
-                $channel->min_amount, 
-                $channel->max_amount
-            ));
+            return back()->with('error', trans('payment.amount_out_of_range', [
+                'min' => number_format($channel->min_amount, 2),
+                'max' => number_format($channel->max_amount, 2)
+            ]));
         }
 
-        $paymentService = new PaymentService(Auth::user(), $channel, $request->amount);
+        $paymentService = PaymentServiceFactory::make($channel->type, Auth::user(), $channel, $request->amount);
         $result = $paymentService->createPayment();
 
         if (!$result['success']) {
@@ -59,17 +61,14 @@ class PaymentController extends Controller
             'order_no' => 'required|string'
         ]);
 
-        $cacheKey = 'payment_' . $request->order_no;
-        $paymentInfo = Cache::get($cacheKey);
+        $recharge = Recharge::where('order_no', $request->order_no)->first();
 
-        if (!$paymentInfo) {
+        if (!$recharge) {
             return response()->json([
                 'success' => false,
-                'message' => '订单不存在或已过期'
+                'message' => trans('payment.order_not_found')
             ]);
         }
-
-        $recharge = Recharge::where('order_no', $request->order_no)->first();
 
         return response()->json([
             'success' => true,
@@ -80,41 +79,24 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function alipayNotify(Request $request)
+    public function handleCallback(Request $request, $channel_type)
     {
-        $paymentService = new PaymentService(null, PaymentChannel::where('type', 'alipay')->first(), 0);
+        Log::info("Nhận callback thanh toán cho kênh: {$channel_type}", $request->all());
+
+        $channel = PaymentChannel::where('type', $channel_type)->firstOrFail();
+        $paymentService = PaymentServiceFactory::make($channel_type, null, $channel, 0);
         $result = $paymentService->handlePaymentCallback($request->all());
 
         if ($result['success']) {
-            return 'success';
+            return $paymentService->successResponse();
         }
-        return 'fail';
-    }
 
-    public function wechatNotify(Request $request)
-    {
-        $paymentService = new PaymentService(null, PaymentChannel::where('type', 'wechat')->first(), 0);
-        $result = $paymentService->handlePaymentCallback($request->all());
-
-        if ($result['success']) {
-            return response()->xml(['return_code' => 'SUCCESS', 'return_msg' => 'OK']);
-        }
-        return response()->xml(['return_code' => 'FAIL', 'return_msg' => $result['message']]);
+        Log::error("Xử lý callback thanh toán thất bại cho kênh: {$channel_type}", ['message' => $result['message']]);
+        return $paymentService->failureResponse($result['message']);
     }
 
     protected function getStatusMessage($state)
     {
-        switch ($state) {
-            case 0:
-                return '待支付';
-            case 1:
-                return '支付中';
-            case 2:
-                return '支付成功';
-            case 3:
-                return '支付失败';
-            default:
-                return '未知状态';
-        }
+        return trans("payment.status.{$state}", [], 'vi', 'payment.status.unknown');
     }
-} 
+}

@@ -3,14 +3,16 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Repositories\Article;
+use App\Models\Articlescate;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
-use App\Models\Articlescate;
 use Dcat\Admin\Http\Controllers\AdminController;
 
 class ArticleController extends AdminController
 {
+    protected $title = 'Quản lý bài viết';
+
     /**
      * Make a grid builder.
      *
@@ -19,19 +21,15 @@ class ArticleController extends AdminController
     protected function grid()
     {
         return Grid::make(new Article(), function (Grid $grid) {
-            $grid->column('id')->sortable();
-            $grid->column('name');
-            $grid->column('cateid')->display(function($cateid){
-                $vipinfo = Articlescate::find($cateid);
-                return ($vipinfo) ? $vipinfo->name : '注册会员';
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('title', 'Tiêu đề');
+            $grid->column('cate_id', 'Danh mục')->display(function ($cateId) {
+                return Articlescate::where('id', $cateId)->value('title');
             });
             $grid->column('created_at');
-            $grid->column('updated_at');
-            $grid->column('stor');
 
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->equal('id');
-
             });
         });
     }
@@ -47,10 +45,11 @@ class ArticleController extends AdminController
     {
         return Show::make($id, new Article(), function (Show $show) {
             $show->field('id');
-            $show->field('name');
-            $show->field('cateid');
-            $show->field('content');
-            $show->field('stor');
+            $show->field('title', 'Tiêu đề');
+            $show->field('content', 'Nội dung');
+            $show->field('cate_id', 'Danh mục');
+            $show->field('created_at');
+            $show->field('updated_at');
         });
     }
 
@@ -63,26 +62,12 @@ class ArticleController extends AdminController
     {
         return Form::make(new Article(), function (Form $form) {
             $form->display('id');
-            $form->text('name');
-            $form->text('enname');
-            $settlements = Articlescate::all();
-            $options = [];
-            foreach ($settlements as $k => $v) {
-                $options[$v->id] = $v->name;
-            }
-            $form->select('cateid','文章分类')->options($options);
-            $form->editor('content')->required();
-            $form->editor('encontent')->required();
-            $form->text('stor');
-            $form->saving(function (Form $form) {
-                // 判断是否是新增操作
-                if ($form->isCreating()) {
-                    $form->created_at = date('Y-m-d H:i:s');
-                    $form->updated_at = date('Y-m-d H:i:s');
-                }else{
-                    $form->updated_at = date('Y-m-d H:i:s');
-                }
-             });
+            $form->text('title', 'Tiêu đề')->required();
+            $form->select('cate_id', 'Danh mục')->options(Articlescate::pluck('title', 'id'))->required();
+            $form->editor('content', 'Nội dung');
+
+            $form->display('created_at');
+            $form->display('updated_at');
         });
     }
 }
