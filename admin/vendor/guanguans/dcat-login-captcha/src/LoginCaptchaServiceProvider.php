@@ -19,11 +19,6 @@ use Illuminate\Support\Facades\Validator;
 class LoginCaptchaServiceProvider extends ServiceProvider
 {
     /**
-     * @var bool
-     */
-    protected $defer = true;
-
-    /**
      * @var string[]
      */
     protected $exceptRoutes = [
@@ -38,6 +33,7 @@ class LoginCaptchaServiceProvider extends ServiceProvider
     {
         parent::init();
         $this->setupConfig();
+        $this->loadMigrationsFrom(__DIR__.'/../updates/2022_08_31_164022_update_admin_settings_for_dcat_login_captcha.php');
         $this->extendValidator();
         Admin::booting($this->app->make(BootingHandler::class));
     }
@@ -89,11 +85,11 @@ class LoginCaptchaServiceProvider extends ServiceProvider
      */
     protected function setupConfig()
     {
-        $source = __DIR__.'/../config/login_captcha.php';
+        $source = __DIR__.'/../config/login-captcha.php';
 
-        $this->mergeConfigFrom($source, 'login_captcha');
+        $this->mergeConfigFrom($source, 'login-captcha');
 
-        static::setting() or static::setting(config('login_captcha'));
+        static::setting((array) static::setting() + (array) config('login-captcha', []));
     }
 
     /**
@@ -112,20 +108,5 @@ class LoginCaptchaServiceProvider extends ServiceProvider
     public function settingForm()
     {
         return new Setting($this);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [
-            PhraseBuilder::class,
-            'gregwar.phrase-builder',
-            CaptchaBuilder::class,
-            'gregwar.captcha-builder',
-        ];
     }
 }

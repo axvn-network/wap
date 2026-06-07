@@ -1,0 +1,96 @@
+[2026-06-07 13:31:53] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Support\\Collection\" not found at /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/helpers.php:109)
+[stacktrace]
+#0 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(240): collect(Array)
+#1 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(202): Illuminate\\Log\\LogManager->createStackDriver(Array)
+#2 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(118): Illuminate\\Log\\LogManager->resolve('stack')
+#3 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(98): Illuminate\\Log\\LogManager->get('stack')
+#4 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(547): Illuminate\\Log\\LogManager->driver()
+#5 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(117): Illuminate\\Log\\LogManager->error('During inherita...', Array)
+#6 /home/user/wap/admin/app/Exceptions/Handler.php(37): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Symfony\\Component\\Debug\\Exception\\FatalErrorException))
+#7 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(92): App\\Exceptions\\Handler->report(Object(Symfony\\Component\\Debug\\Exception\\FatalErrorException))
+#8 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(134): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleException(Object(Symfony\\Component\\Debug\\Exception\\FatalErrorException))
+#9 [internal function]: Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleShutdown()
+#10 {main}
+"} 
+[2026-06-07 13:31:53] laravel.ERROR: During inheritance of ArrayAccess: Uncaught ErrorException: Return type of Illuminate\Support\Collection::offsetExists($key) should either be compatible with ArrayAccess::offsetExists(mixed $offset): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php:1277
+Stack trace:
+#0 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php(11): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8192, 'Return type of ...', '/home/user/wap/...', 1277)
+#1 /home/user/wap/admin/vendor/composer/ClassLoader.php(571): include('/home/user/wap/...')
+#2 /home/user/wap/admin/vendor/composer/ClassLoader.php(428): Composer\Autoload\includeFile('/home/user/wap/...')
+#3 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/helpers.php(109): Composer\Autoload\ClassLoader->loadClass('Illuminate\\Supp...')
+#4 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(130): collect(Array)
+#5 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(106): Illuminate\Foundation\PackageManifest->build()
+#6 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(89): Illuminate\Foundation\PackageManifest->getManifest()
+#7 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(78): Illuminate\Foundation\PackageManifest->config('aliases')
+#8 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterFacades.php(26): Illuminate\Foundation\PackageManifest->aliases()
+#9 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(219): Illuminate\Foundation\Bootstrap\RegisterFacades->bootstrap(Object(Illuminate\Foundation\Application))
+#10 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(320): Illuminate\Foundation\Application->bootstrapWith(Array)
+#11 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\Foundation\Console\Kernel->bootstrap()
+#12 /home/user/wap/admin/artisan(35): Illuminate\Foundation\Console\Kernel->handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#13 {main} {"exception":"[object] (Symfony\\Component\\Debug\\Exception\\FatalErrorException(code: 1): During inheritance of ArrayAccess: Uncaught ErrorException: Return type of Illuminate\\Support\\Collection::offsetExists($key) should either be compatible with ArrayAccess::offsetExists(mixed $offset): bool, or the #[\\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php:1277
+Stack trace:
+#0 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php(11): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(8192, 'Return type of ...', '/home/user/wap/...', 1277)
+#1 /home/user/wap/admin/vendor/composer/ClassLoader.php(571): include('/home/user/wap/...')
+#2 /home/user/wap/admin/vendor/composer/ClassLoader.php(428): Composer\\Autoload\\includeFile('/home/user/wap/...')
+#3 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/helpers.php(109): Composer\\Autoload\\ClassLoader->loadClass('Illuminate\\\\Supp...')
+#4 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(130): collect(Array)
+#5 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(106): Illuminate\\Foundation\\PackageManifest->build()
+#6 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(89): Illuminate\\Foundation\\PackageManifest->getManifest()
+#7 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(78): Illuminate\\Foundation\\PackageManifest->config('aliases')
+#8 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterFacades.php(26): Illuminate\\Foundation\\PackageManifest->aliases()
+#9 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(219): Illuminate\\Foundation\\Bootstrap\\RegisterFacades->bootstrap(Object(Illuminate\\Foundation\\Application))
+#10 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(320): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#11 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#12 /home/user/wap/admin/artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#13 {main} at /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php:11)
+[stacktrace]
+#0 {main}
+"} 
+[2026-06-07 13:47:32] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Support\\Collection\" not found at /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/helpers.php:109)
+[stacktrace]
+#0 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(240): collect(Array)
+#1 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(202): Illuminate\\Log\\LogManager->createStackDriver(Array)
+#2 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(118): Illuminate\\Log\\LogManager->resolve('stack')
+#3 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(98): Illuminate\\Log\\LogManager->get('stack')
+#4 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(543): Illuminate\\Log\\LogManager->driver()
+#5 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(124): Illuminate\\Log\\LogManager->error('During inherita...', Array)
+#6 /home/user/wap/admin/app/Exceptions/Handler.php(37): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Symfony\\Component\\Debug\\Exception\\FatalErrorException))
+#7 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(92): App\\Exceptions\\Handler->report(Object(Symfony\\Component\\Debug\\Exception\\FatalErrorException))
+#8 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(134): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleException(Object(Symfony\\Component\\Debug\\Exception\\FatalErrorException))
+#9 [internal function]: Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleShutdown()
+#10 {main}
+"} 
+[2026-06-07 13:47:32] laravel.ERROR: During inheritance of ArrayAccess: Uncaught ErrorException: Return type of Illuminate\Support\Collection::offsetExists($key) should either be compatible with ArrayAccess::offsetExists(mixed $offset): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php:1277
+Stack trace:
+#0 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php(11): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8192, 'Return type of ...', '/home/user/wap/...', 1277)
+#1 /home/user/wap/admin/vendor/composer/ClassLoader.php(576): include('/home/user/wap/...')
+#2 /home/user/wap/admin/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/user/wap/...')
+#3 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/helpers.php(109): Composer\Autoload\ClassLoader->loadClass('Illuminate\\Supp...')
+#4 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(130): collect(Array)
+#5 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(106): Illuminate\Foundation\PackageManifest->build()
+#6 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(89): Illuminate\Foundation\PackageManifest->getManifest()
+#7 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(78): Illuminate\Foundation\PackageManifest->config('aliases')
+#8 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterFacades.php(26): Illuminate\Foundation\PackageManifest->aliases()
+#9 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(219): Illuminate\Foundation\Bootstrap\RegisterFacades->bootstrap(Object(Illuminate\Foundation\Application))
+#10 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(320): Illuminate\Foundation\Application->bootstrapWith(Array)
+#11 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\Foundation\Console\Kernel->bootstrap()
+#12 /home/user/wap/admin/artisan(37): Illuminate\Foundation\Console\Kernel->handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#13 {main} {"exception":"[object] (Symfony\\Component\\Debug\\Exception\\FatalErrorException(code: 1): During inheritance of ArrayAccess: Uncaught ErrorException: Return type of Illuminate\\Support\\Collection::offsetExists($key) should either be compatible with ArrayAccess::offsetExists(mixed $offset): bool, or the #[\\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php:1277
+Stack trace:
+#0 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php(11): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(8192, 'Return type of ...', '/home/user/wap/...', 1277)
+#1 /home/user/wap/admin/vendor/composer/ClassLoader.php(576): include('/home/user/wap/...')
+#2 /home/user/wap/admin/vendor/composer/ClassLoader.php(427): Composer\\Autoload\\{closure}('/home/user/wap/...')
+#3 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/helpers.php(109): Composer\\Autoload\\ClassLoader->loadClass('Illuminate\\\\Supp...')
+#4 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(130): collect(Array)
+#5 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(106): Illuminate\\Foundation\\PackageManifest->build()
+#6 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(89): Illuminate\\Foundation\\PackageManifest->getManifest()
+#7 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(78): Illuminate\\Foundation\\PackageManifest->config('aliases')
+#8 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterFacades.php(26): Illuminate\\Foundation\\PackageManifest->aliases()
+#9 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(219): Illuminate\\Foundation\\Bootstrap\\RegisterFacades->bootstrap(Object(Illuminate\\Foundation\\Application))
+#10 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(320): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#11 /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#12 /home/user/wap/admin/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#13 {main} at /home/user/wap/admin/vendor/laravel/framework/src/Illuminate/Support/Collection.php:11)
+[stacktrace]
+#0 {main}
+"} 

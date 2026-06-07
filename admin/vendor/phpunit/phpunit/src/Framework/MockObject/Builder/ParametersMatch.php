@@ -10,9 +10,9 @@
 namespace PHPUnit\Framework\MockObject\Builder;
 
 /**
- * @internal This class is not covered by the backward compatibility promise for PHPUnit
+ * @internal This interface is not covered by the backward compatibility promise for PHPUnit
  */
-interface ParametersMatch extends Match
+interface ParametersMatch extends Match_
 {
     /**
      * Sets the parameters to match for, each parameter to this function will

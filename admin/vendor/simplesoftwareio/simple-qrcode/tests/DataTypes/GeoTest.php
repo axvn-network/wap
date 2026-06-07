@@ -1,18 +1,10 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use SimpleSoftwareIO\QrCode\DataTypes\Geo;
 
-/**
- * Simple Laravel QrCode Generator
- * A simple wrapper for the popular BaconQrCode made for Laravel.
- *
- * @link http://www.simplesoftware.io
- * @author SimpleSoftware support@simplesoftware.io
- *
- */
-
-class GeoTest extends \PHPUnit_Framework_TestCase{
-
+class GeoTest extends TestCase
+{
     public function test_it_generates_the_proper_format_for_a_geo_coordinate()
     {
         $geo = new Geo();

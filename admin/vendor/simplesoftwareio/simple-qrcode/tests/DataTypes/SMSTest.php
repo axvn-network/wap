@@ -1,21 +1,13 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use SimpleSoftwareIO\QrCode\DataTypes\SMS;
 
-/**
- * Simple Laravel QrCode Generator
- * A simple wrapper for the popular BaconQrCode made for Laravel.
- *
- * @link http://www.simplesoftware.io
- * @author SimpleSoftware support@simplesoftware.io
- *
- */
-
-class SMSTest extends \PHPUnit_Framework_TestCase{
-
-    public function setUp()
+class SMSTest extends TestCase
+{
+    public function setUp(): void
     {
-        $this->sms = new SMS;
+        $this->sms = new SMS();
     }
 
     public function test_it_generates_a_proper_format_with_a_phone_number()
@@ -31,7 +23,7 @@ class SMSTest extends \PHPUnit_Framework_TestCase{
     {
         $this->sms->create([null, 'foo']);
 
-        $properFormat = 'sms::foo';
+        $properFormat = 'sms:&body=foo';
 
         $this->assertEquals($properFormat, strval($this->sms));
     }
@@ -40,7 +32,7 @@ class SMSTest extends \PHPUnit_Framework_TestCase{
     {
         $this->sms->create(['555-555-5555', 'foo']);
 
-        $properFormat = 'sms:555-555-5555:foo';
+        $properFormat = 'sms:555-555-5555&body=foo';
 
         $this->assertEquals($properFormat, strval($this->sms));
     }

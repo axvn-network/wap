@@ -77,4 +77,33 @@ return [
         'Rename login_captcha_get -> login_captcha_content.',
         'Update github config files.',
     ],
+    '1.0.15' => [
+        'Fix captcha check.',
+    ],
+    '1.0.16' => [
+        'Add migration files.',
+    ],
+    '1.0.17' => [
+        'Fix migration file name.',
+    ],
+    '1.0.18' => [
+        'Update to single action controller.',
+        'Fix setting.',
+        'Optimize migration file.',
+    ],
+    '1.0.19' => [
+        'Fix loading config.',
+        'Remove version update migration.',
+        'Cancel service late registration.',
+    ],
+    '1.1.0' => [
+        'chore(deps): update overtrue/phplint to support more versions.',
+        'update LoginCaptchaServiceProvider.php to merge config correctly(#27).',
+        'Bump dependabot/fetch-metadata from 1.3.5 to 1.3.6.',
+        'Bump actions/stale from 6 to 7.',
+        'Update vimeo/psalm requirement from ^4.0 to ^4.0 || ^5.0.',
+        'Bump dependabot/fetch-metadata from 1.3.4 to 1.3.5.',
+        'Bump dependabot/fetch-metadata from 1.3.3 to 1.3.4.',
+        'Bump actions/stale from 5 to 6.',
+    ],
 ];

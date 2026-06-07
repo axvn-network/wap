@@ -10,7 +10,6 @@
 
 namespace Guanguans\DcatLoginCaptcha\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Response;
 
 class SetResponseContentType
@@ -18,11 +17,9 @@ class SetResponseContentType
     /**
      * Handle an incoming request.
      *
-     * @param $request
-     *
      * @return \Illuminate\Http\Response
      */
-    public function handle($request, Closure $next, string $type)
+    public function handle($request, \Closure $next, string $type)
     {
         return tap($next($request), function (Response $response) use ($type) {
             $response->header('Content-Type', sprintf('image/%s', $type));

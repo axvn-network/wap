@@ -1,19 +1,11 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use SimpleSoftwareIO\QrCode\DataTypes\Email;
 
-/**
- * Simple Laravel QrCode Generator
- * A simple wrapper for the popular BaconQrCode made for Laravel.
- *
- * @link http://www.simplesoftware.io
- * @author SimpleSoftware support@simplesoftware.io
- *
- */
-
-class EmailTest extends \PHPUnit_Framework_TestCase{
-
-    public function setUp()
+class EmailTest extends TestCase
+{
+    public function setUp(): void
     {
         $this->email = new Email();
     }
@@ -54,11 +46,10 @@ class EmailTest extends \PHPUnit_Framework_TestCase{
         $this->assertEquals($properFormat, strval($this->email));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function test_it_throws_an_exception_when_an_invalid_email_is_given()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->email->create(['foo']);
     }
 }

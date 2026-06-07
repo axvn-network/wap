@@ -2,6 +2,41 @@
 
 All notable changes to `guanguans/dcat-login-captcha` will be documented in this file.
 
+## 1.1.0 - 2023-03-20
+
+* chore(deps): update overtrue/phplint to support more versions.
+* update LoginCaptchaServiceProvider.php to merge config correctly(#27).
+* Bump dependabot/fetch-metadata from 1.3.5 to 1.3.6.
+* Bump actions/stale from 6 to 7.
+* Update vimeo/psalm requirement from ^4.0 to ^4.0 || ^5.0.
+* Bump dependabot/fetch-metadata from 1.3.4 to 1.3.5.
+* Bump dependabot/fetch-metadata from 1.3.3 to 1.3.4.
+* Bump actions/stale from 5 to 6.
+
+## 1.0.19 - 2022-09-08
+
+* Fix loading config.
+* Remove version update migration.
+* Cancel service late registration.
+
+## 1.0.18 - 2022-09-01
+
+* Update to single action controller.
+* Fix setting.
+* Optimize migration file.
+
+## 1.0.17 - 2022-08-31
+
+* Fix migration file name.
+
+## 1.0.16 - 2022-08-31
+
+* Add migration files.
+
+## 1.0.15 - 2022-08-24
+
+* Fix captcha check.
+
 ## 1.0.14 - 2022-07-13
 
 * Rename login_captcha_get -> login_captcha_content.

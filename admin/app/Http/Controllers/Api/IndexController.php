@@ -209,7 +209,7 @@ class IndexController extends Controller
             }
         }
 
-        $res = $this->tgService->login($user->username, $data['plat_name'], $this->getGameTypeForLogin($data['game_code']), $data['is_mobile_url'] ?? 1, $data['game_type']);
+        $res = $this->tgService->login($user->username, $data['plat_name'], $this->getGameTypeForLogin($data['game_type']), $data['is_mobile_url'] ?? 1, $data['game_type']);
 
         if ($res['code'] == 200) {
             return $this->returnMsg(200, ['url' => $res['data']]);
@@ -549,7 +549,10 @@ class IndexController extends Controller
     public function uptransferstatus(Request $request)
     {
         $user = Auth::user();
-        $user->update($request->all());
+        $validatedData = $request->validate([
+            'transferstatus' => 'required|boolean',
+        ]);
+        $user->update($validatedData);
         return $this->returnMsg(200, '', '申请成功');
     }
 
