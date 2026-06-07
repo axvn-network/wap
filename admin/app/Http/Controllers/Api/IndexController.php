@@ -1,7 +1,10 @@
 <?php
-//decode by http://www.yunlu99.com/
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\GetGameUrlRequest;
+use App\Http\Requests\Api\TransRecordRequest;
 use App\Models\Activity;
 use App\Models\ActivityApply;
 use App\Models\ActivityType;
@@ -14,7 +17,6 @@ use App\Models\PaySetting;
 use App\Models\SystemConfig;
 use App\Models\UserCard;
 use App\Models\User;
-use App\Models\Users;
 use App\Models\Usersmoney;
 use App\Services\TgService;
 use Illuminate\Http\Request;
@@ -28,1093 +30,843 @@ use App\Models\Banner;
 use App\Models\GameRecord;
 use App\Models\AgentApply;
 use App\Models\GameList;
+use Illuminate\Support\Facades\DB;
 
 class IndexController extends Controller
 {
-    protected $messages = [];
-    protected $game_list ;
-    protected $banklist;
+    protected $tgService;
 
-    public function __construct()
+    public function __construct(TgService $tgService)
     {
-        $tg = New TgService;
-
-        $this->game_list =$tg->getallgamename();
-        $this->gamemoney_list =$tg->getallmoneygamelist();
-        $this->banklist = ['工商银行'=>'Icbc','中国农业银行'=>'Abc','招商银行'=>'Cmb','建设银行'=>'Ccb','中信银行'=>'Cibk','中国银行'=>'Boc','交通银行'=>'Bocom','华夏银行'=>'Hxbc','民生银行'=>'Cmbc','光大银行'=>'Cebc','兴业银行'=>'Fjib','浦发银行'=>'Spdb'];
-        $domain = SystemConfig::getValue('safe_domain');
-        if ($domain) {
-            $domain = explode(',',$domain);
-            $referer = $_SERVER["HTTP_REFERER"] ?? '';
-            if (!in_array($referer,$domain)) {
-                return json_encode(['code'=>401,'message'=>'认证失败']);
-                exit;
-            }
-        }
-
+        $this->tgService = $tgService;
     }
+
     public function credit(Request $request)
     {
         $api_code = $request->input('api_code');
-		$tg = New TgService;
-		$data = $tg->credit($api_code);
+        $data = $this->tgService->credit($api_code);
         return $data;
-    }	
-    /**
-     * 公告列表
-     *
-     * @return void
-     */
+    }
+
     public function bannerList(Request $request)
     {
-        $type = $request->input('type') ?? 2;
-        $bannerlist = array(
-            ["src"=>"/static/style/2ddb21b7a3564870bbac1b02e05b3f8d.jpg","background"=>"#f4f6ff"],
-            ["src"=>"/static/style/008dc0a27cdf42708dcce9b516695469.jpg","background"=>"rgb(100, 61, 202)"],
-            );
-        $notice = Banner::where('type',$type)->select("pic as src","jump_url")->get()->toArray();    
-       
-        if(count($notice)){
-            $bannerlist=[];
-            foreach ($notice as $val){
-                $bannerlist[]=["src"=>env('APP_URL').'/uploads/'.$val['src'],"background"=>"#f4f6ff",'url'=>$val['jump_url']] ;
-            }        
-        }
+        $type = $request->input('type', 2);
+        $bannerlist = Banner::where('type', $type)
+            ->select("pic as src", "jump_url")
+            ->get()
+            ->map(function ($banner) {
+                return [
+                    "src" => config('app.url') . '/uploads/' . $banner->src,
+                    "background" => "#f4f6ff",
+                    'url' => $banner->jump_url
+                ];
+            });
+
         return $this->returnMsg(200, $bannerlist);
     }
-    
+
     public function article(Request $request)
     {
         $type = $request->input('type');
-        $data = Article::where('cateid',$type)->first();
-        return $this->returnMsg(200,$data);
+        $data = Article::where('cateid', $type)->first();
+        return $this->returnMsg(200, $data);
     }
-    
-    /**
-     * 公告列表
-     *
-     * @return void
-     */
+
     public function Systemstatus()
     {
-         $isclose = SystemConfig::query()->find("isclose");
-         $data =[];
-        if($isclose['value']){
+        $isclose = SystemConfig::query()->find("isclose");
+        $data = [];
+        if ($isclose['value']) {
             $webcontent = SystemConfig::query()->find("webcontent");
             $data['content'] = $webcontent['value'];
-            $data['isclose'] = 0;
-        }else{
+            $data['isclose'] = 1;
+        } else {
             $data['content'] = '';
             $data['isclose'] = 0;
         }
         return $this->returnMsg(200, $data);
     }
-        
 
-    /**
-     * 通知公告列表
-     *
-     * @return void
-     */
-    public function uservip(Request $request)
+    public function uservip()
     {
         $vip = UserVip::get();
         return $this->returnMsg(200, $vip);
-    }    
-    /**
-     * 通知公告列表
-     *
-     * @return void
-     */
-    public function homenotice(Request $request)
-    {
-        $notice = Article::where('cateid',6)->limit(3)->select("name")->get();
-        $shownotice=[];
-        foreach ($notice as $val){
-            $shownotice[]=$val['name'];
-        }        
-        return $this->returnMsg(200, $shownotice);
     }
-    /**
-     * 通知公告列表
-     *
-     * @return void
-     */
-    public function homecontent(Request $request)
+
+    public function homenotice()
     {
-        $notice = Article::where('cateid','<>',6)->get();
+        $notice = Article::where('cateid', 6)->limit(3)->pluck("name");
         return $this->returnMsg(200, $notice);
-    }      
-    /**
-     * 通知公告列表
-     *
-     * @return void
-     */
+    }
+
+    public function homecontent()
+    {
+        $notice = Article::where('cateid', '<', 6)->get();
+        return $this->returnMsg(200, $notice);
+    }
+
     public function homenoticelist(Request $request)
     {
-        $notice = Article::where('cateid',6)->paginate(10);
+        $notice = Article::where('cateid', 6)->paginate(10);
         return $this->returnMsg(200, $notice);
-    }   
-    /**
-     * 通知公告列表
-     *
-     * @return void
-     */
+    }
+
     public function homenoticedeatil(Request $request)
     {
         $data = $request->all();
-        $notice = Article::where('id',$data['id'])->first();
+        $notice = Article::where('id', $data['id'])->first();
         return $this->returnMsg(200, $notice);
-    }    
-    /**
-     * 公告列表
-     *
-     * @return void
-     */
-    public function cateList(Request $request)
+    }
+
+    public function cateList()
     {
-        $list = array(
-            ["id"=>1,"pid"=>0,"name"=>"电子游艺","enname"=>"concise"],
-            ["id"=>2,"pid"=>0,"name"=>"棋牌游戏","enname"=>"joker"],
-            ["id"=>3,"pid"=>0,"name"=>"视讯直播","enname"=>"realbet"],
-            ["id"=>4,"pid"=>0,"name"=>"彩票游戏","enname"=>"lottery"],
-            ["id"=>5,"pid"=>0,"name"=>"电竞游戏","enname"=>"gaming"],
-            ["id"=>6,"pid"=>0,"name"=>"体育赛事","enname"=>"sport"],
-            );
+        $list = [
+            ["id" => 1, "pid" => 0, "name" => "电子游艺", "enname" => "concise"],
+            ["id" => 2, "pid" => 0, "name" => "棋牌游戏", "enname" => "joker"],
+            ["id" => 3, "pid" => 0, "name" => "视讯直播", "enname" => "realbet"],
+            ["id" => 4, "pid" => 0, "name" => "彩票游戏", "enname" => "lottery"],
+            ["id" => 5, "pid" => 0, "name" => "电竞游戏", "enname" => "gaming"],
+            ["id" => 6, "pid" => 0, "name" => "体育赛事", "enname" => "sport"],
+        ];
         return $this->returnMsg(200, $list);
-    }    
-    /**
-     * 个人消息
-     *
-     * @return void
-     */
+    }
+
     public function noticeList(Request $request)
     {
-        $rules = [
-            'limit' => 'nullable|integer',
-            'page' => 'nullable|integer',
-        ];
-        $this->validate($request, $rules, $this->messages);
-        $data = $request->all();
-        $limit = $data['limit'] ?? 10;
+        $limit = $request->input('limit', 10);
         $list = Message::orderBy('id', 'desc')->paginate($limit);
         return $this->returnMsg(200, $list);
     }
-    /**
-     * 活动类型
-     *
-     * @return void
-     */
+
     public function activityType()
     {
         $list = ActivityType::all();
         return $this->returnMsg(200, $list);
     }
 
-    /**
-     * 活动列表
-     *
-     * @param Request $request
-     * @return void
-     */
     public function activityList(Request $request)
     {
-        $rules = [
-            'type' => 'nullable|integer'
-        ];
-        $this->validate($request, $rules, $this->messages);
-        $data = $request->all();
-        $type = $data['type'] ?? '';
+        $type = $request->input('type');
         $list = Activity::when($type, function ($query) use ($type) {
             return $query->where('type', $type);
-        })->select('id','title','type','entitle','apply_count','banner','can_apply','state','created_at')->orderBy('id', 'desc')->paginate(10);
+        })->select('id', 'title', 'type', 'entitle', 'apply_count', 'banner', 'can_apply', 'state', 'created_at')->orderBy('id', 'desc')->paginate(10);
         return $this->returnMsg(200, $list);
     }
-    /**
-     * 活动详情
-     *
-     * @param Request $request
-     * @return void
-     */    
+
     public function activitydeatil(Request $request)
     {
-        $rules = [
-            'id' => 'nullable|integer'
-        ];
-        $this->validate($request, $rules, $this->messages);
-        $data = $request->all();
-        $id = $data['id'] ?? 0;
+        $id = $request->input('id', 0);
         $activity = Activity::where('id', $id)->first();
         return $this->returnMsg(200, $activity);
     }
 
-    /**
-     * 获取客服链接
-     *
-     * @return void
-     */
     public function getServicerUrl()
     {
-        $url = SystemConfig::getValue('kf_url') ?? '';
-        return $this->returnMsg(200, ['url' => $url,'domain'=>env('APP_URL')]);
+        $url = SystemConfig::getValue('kf_url');
+        return $this->returnMsg(200, ['url' => $url, 'domain' => config('app.url')]);
     }
 
-
-    /**
-     * 获取游戏分类
-     *
-     * @param Request $request
-     * @return void
-     */
     public function getGameList(Request $request)
     {
-        
-        
-        $platform = $request->input('platform_name') ?? '';
-        $category = $request->input('game_type') ?? '';
-        $list = GameList::when($platform,function ($query) use ($platform){
-            return $query->where('platform_name',$platform);
-        })->when($category,function ($query) use ($category){
-            return $query->where('category_id',$category);
-        })->where('is_top',1)->where('app_state',1)->select('name','game_code as gamecode','category_id','game_code','app_state')->orderBy('order_by','desc')->get();
-        //return $this->returnMsg(200,$list);
-        $gamelist =[];
-        foreach($list as $val){
-           $gamelist[$val->gamecode] =  $val->app_state;
-        }
-        $rules = [
-            'game_type' => 'nullable',
-        ];
-        $this->validate($request, $rules, $this->messages);
-        $data = $request->all();
-        $game_type = $data['game_type'] ?? '';
-        $tg = new TgService;
-        $res = $tg->gametypelist($game_type);
-        $gamelist1=[];
-        foreach ($res['data'] as $vals){
-            if((isset($gamelist[$vals['gamecode']]) && $gamelist[$vals['gamecode']]) || in_array($vals['gamecode'],['ae','fgdz','pp','obgdy'])){
-                $gamelist1[] = $vals;
+        $platform = $request->input('platform_name');
+        $category = $request->input('game_type');
+
+        $gamelist = GameList::when($platform, function ($query) use ($platform) {
+            return $query->where('platform_name', $platform);
+        })
+            ->when($category, function ($query) use ($category) {
+                return $query->where('category_id', $category);
+            })
+            ->where('is_top', 1)
+            ->where('app_state', 1)
+            ->select('name', 'game_code as gamecode', 'category_id', 'game_code', 'app_state')
+            ->orderBy('order_by', 'desc')
+            ->get()
+            ->pluck('app_state', 'gamecode')
+            ->toArray();
+
+        $game_type = $request->input('game_type');
+        $res = $this->tgService->gametypelist($game_type);
+
+        $gamelist1 = collect($res['data'])->filter(function ($vals) use ($gamelist) {
+            return (isset($gamelist[$vals['gamecode']]) && $gamelist[$vals['gamecode']]) || in_array($vals['gamecode'], ['ae', 'fgdz', 'pp', 'obgdy']);
+        })->values()->all();
+
+        return $this->returnMsg(200, $gamelist1);
+    }
+
+    public function getGameUrl(GetGameUrlRequest $request)
+    {
+        $data = $request->validated();
+        $user = Auth::user();
+
+        $this->registerApiIfNecessary($data['plat_name'], $user);
+
+        if ($user->transferstatus == 1) {
+            $mz = $this->allmz($data['plat_name'], $user->id);
+            if ($mz['code'] != 200) {
+                return $this->returnMsg(500, [], $mz['message']);
             }
         }
-        
-        return $this->returnMsg(200,$gamelist1);
-        
+
+        $res = $this->tgService->login($user->username, $data['plat_name'], $this->getGameTypeForLogin($data['game_code']), $data['is_mobile_url'] ?? 1, $data['game_type']);
+
+        if ($res['code'] == 200) {
+            return $this->returnMsg(200, ['url' => $res['data']]);
+        }
+
+        return $this->returnMsg(500, $res, $res['message']);
     }
 
-    /**
-     * 获取游戏地址
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function getGameUrl(Request $request)
+    private function registerApiIfNecessary($apiCode, $user)
     {
-        $rules = [
-            'plat_name' => 'required',
-            'game_type' => 'required',
-            'game_code' => 'nullable',
-            'is_mobile_url' => 'nullable',
-        ];
+        $userApi = User_Api::where('api_code', $apiCode)->where('user_id', $user->id)->first();
 
-        $this->validate($request, $rules, $this->messages);
-        $data = $request->all();
-     
-        $api_code = $data['plat_name'];
-        $gameCode = $data['game_type'];
-        $gameType = $data['game_code'] ?? '';
-        $is_mobile_url = $data['is_mobile_url'] ?? 1;
+        if (!$userApi) {
+            $result = $this->tgService->register($apiCode, $user->username);
+            if ($result['code'] != 200) {
+                return $this->returnMsg(201, '', $result['message']);
+            }
 
-        $tg = new TgService;
-        
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        
-        $user = User::where('api_token',$token)->lockForUpdate()->first();
-
-		$User_Api = User_Api::where('api_code',$api_code)->where('user_id',$user->id)->first();
-		if(!$User_Api){
-			$result = $tg->register($api_code,$user->username);
-            if($result['code'] != 200){
-				return $this->returnMsg(201, '', $result['message']);
-			}
-			$arr = [
-				'user_id' => $user->id,
-				'api_user' => $user->username,
-				'api_pass' => 123456,
-				'api_code' => $api_code,
-			];
-			$User_Api = User_Api::create($arr);		    
-		}
-		$leixing = '1';
-		if($gameType == 'sport'){
-			$leixing = '5';
-		}
-		if($gameType == 'concise'){
-			$leixing = '3';
-		}
-		if($gameType == 'gaming'){
-			$leixing = '7';
-		}
-		if($gameType == 'joker'){
-			$leixing = '6';
-		}
-		if($gameType == 'lottery'){
-			$leixing = '4';
-		}		
-        if($user->transferstatus == 1){
-			$mz = $this->allmz($api_code,$user->id);
-			if($mz['code'] != 200){
-				return $this->returnMsg(500,[],$mz['message']);				
-			}
-		}		
-        $res = $tg->login($user->username, $api_code, $leixing, $is_mobile_url, $gameCode);
-        
-        if ($res['code'] == 200) {
-
-            return $this->returnMsg(200, ['url' => $res['data']]);
-        } else {
-            return $this->returnMsg(500,$res,$res['message']);
+            User_Api::create([
+                'user_id' => $user->id,
+                'api_user' => $user->username,
+                'api_pass' => '123456',
+                'api_code' => $apiCode,
+            ]);
         }
     }
 
-
-    public function allmz($plat_name,$userid){
-        $user = User::where('id',$userid)->first();
-		$tg = new TgService;
-		$TransferLog = TransferLog::where('transfer_type', 0)->where('user_id', $user->id)->orderBy('id', 'desc')->first();
-        if($TransferLog && $TransferLog->api_type != $plat_name){			
-			$result = $tg->balance($TransferLog->api_type,$user->username);
-			if($result['code'] != 200){
-				return $result;
-			}
-			$api_money = $result['data'];
-			if($api_money >= '1'){
-				$api_money = intval($api_money);
-				$client_transfer_id = time() . $user->id . rand(100000, 999999);
-				$arr = [
-					'order_no' => $client_transfer_id,
-					'api_type' => $TransferLog->api_type,
-					'user_id' => $user->id,
-					'transfer_type' => 1,
-					'money' => $api_money,
-					'cash_fee' => 0,
-					'real_money' => $api_money,
-					'before_money' => $user->balance ,
-					'after_money' => $user->balance + $api_money,
-					'state' => 2
-				];
-				$Transfers_id = TransferLog::create($arr);
-
-				$res = $tg->withdrawal($user->username, $api_money, $client_transfer_id, $TransferLog->api_type);
-				if($res['code'] != 200){
-					$Transfers_id->delete();
-					return $res;
-				}
-				$user->increment('balance', $api_money);
-				$transferlog = TransferLog::where('order_no', $client_transfer_id)->first();
-				$transferlog->state = 1;
-				$transferlog->save();
-				$user_api = User_Api::where('api_code', $TransferLog->api_type)->where('user_id', $user->id)->where('api_user', $user->username)->first();
-				if($user_api->api_money <= $api_money){
-					$user_api->api_money = 0;
-					$user_api->save();						
-				}else{
-					$user_api->api_money -= $api_money;
-					$user_api->save();						
-				}
-			}
-		}
-        $balance = $user->balance;
-		
-		if($balance >= '1'){            
-			$client_transfer_id = time() . $user->id . rand(100000, 999999);
-			$arr = [
-				'order_no' => $client_transfer_id,
-				'api_type' => $plat_name,
-				'user_id' => $user->id,
-				'transfer_type' => 0,
-				'money' => -$balance,
-				'cash_fee' => 0,
-				'real_money' => -$balance,
-				'before_money' => $user->balance ,
-				'after_money' => $user->balance - $balance,
-				'state' => 2
-			];
-			$Transfers_id = TransferLog::create($arr);
-            $balance = intval($balance);
-			$res = $tg->deposit($user->username, $balance, $client_transfer_id, $plat_name);
-			if($res['code'] != 200){
-				$Transfers_id->delete();
-				return $res;
-			}
-			$user->decrement('balance', $balance);
-			$transferlog = TransferLog::where('order_no', $client_transfer_id)->first();
-			$transferlog->state = 1;
-			$transferlog->save();
-			$user_api = User_Api::where('api_code', $plat_name)->where('user_id', $user->id)->where('api_user', $user->username)->first();
-			$user_api->increment('api_money', $balance);
-		}
-        return array('code' => 200, 'message' => '成功');
-	}
-    
-    /**
-     * 进入游戏后自动转账到游戏账户
-     * @return void
-     */
-    public function transToTgAccount($user,$plat_name, $game_type)
+    private function getGameTypeForLogin($gameType)
     {
-        $tg = new TgService;
-                $plat_name = ($plat_name=='fgdz') ? 'fg' : $plat_name;
-                if ($user->balance > 0) {
-                    $client_transfer_id = time() . $user->id . rand(1000, 9999);
-                   $amount = $user->balance;
-                    $res = $tg->trans($user->username, $user->balance, $client_transfer_id, $plat_name, $game_type);
-                    if ($res['code'] == 200) {
-                        $user->balance = 0;
-                        $user->save();
-                        $arr = [
-                            'order_no' => $client_transfer_id,
-                            'api_type' => $plat_name,
-                            'user_id' => $user->id,
-                            'transfer_type' => 0,
-                            'money' => -$amount,
-                            'cash_fee' => 0,
-                            'real_money' => $amount,
-                            'before_money' =>$amount ,
-                            'after_money' =>0,
-                            'state' => 1
-                        ];
-                        TransferLog::create($arr);
-                         Usersmoney::addinfo($user->id, $plat_name, $amount);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
+        $gameTypes = [
+            'sport' => '5',
+            'concise' => '3',
+            'gaming' => '7',
+            'joker' => '6',
+            'lottery' => '4',
+        ];
 
+        return $gameTypes[$gameType] ?? '1';
+    }
 
-    }    
-    /**
-     * 下注记录
-     *
-     * @param Request $request
-     * @return void
-     */
+    private function allmz($plat_name, $userId)
+    {
+        return DB::transaction(function () use ($plat_name, $userId) {
+            $user = User::lockForUpdate()->find($userId);
+
+            $this->transferFromPreviousGame($plat_name, $user);
+            $this->transferToNewGame($plat_name, $user);
+
+            return ['code' => 200, 'message' => '成功'];
+        });
+    }
+
+    private function transferFromPreviousGame($plat_name, $user)
+    {
+        $transferLog = TransferLog::where('transfer_type', 0)->where('user_id', $user->id)->latest()->first();
+
+        if ($transferLog && $transferLog->api_type != $plat_name) {
+            $result = $this->tgService->balance($transferLog->api_type, $user->username);
+            if ($result['code'] != 200) {
+                throw new \Exception($result['message']);
+            }
+
+            $api_money = (int)$result['data'];
+
+            if ($api_money >= 1) {
+                $this->withdrawFromGame($user, $transferLog->api_type, $api_money);
+            }
+        }
+    }
+
+    private function withdrawFromGame($user, $api_type, $api_money)
+    {
+        $client_transfer_id = time() . $user->id . rand(100000, 999999);
+        $res = $this->tgService->withdrawal($user->username, $api_money, $client_transfer_id, $api_type);
+        if ($res['code'] != 200) {
+            throw new \Exception($res['message']);
+        }
+
+        $user->increment('balance', $api_money);
+        $this->createTransferLog($client_transfer_id, $api_type, $user, 1, $api_money, 1);
+
+        $user_api = User_Api::where('api_code', $api_type)->where('user_id', $user->id)->first();
+        if ($user_api) {
+            $user_api->api_money = max(0, $user_api->api_money - $api_money);
+            $user_api->save();
+        }
+    }
+
+    private function transferToNewGame($plat_name, $user)
+    {
+        $balance = (int)$user->balance;
+        if ($balance >= 1) {
+            $client_transfer_id = time() . $user->id . rand(100000, 999999);
+            $res = $this->tgService->deposit($user->username, $balance, $client_transfer_id, $plat_name);
+
+            if ($res['code'] != 200) {
+                throw new \Exception($res['message']);
+            }
+
+            $user->decrement('balance', $balance);
+            $this->createTransferLog($client_transfer_id, $plat_name, $user, 0, -$balance, 1);
+
+            $user_api = User_Api::where('api_code', $plat_name)->where('user_id', $user->id)->first();
+            if ($user_api) {
+                $user_api->increment('api_money', $balance);
+            }
+        }
+    }
+
+    private function createTransferLog($order_no, $api_type, $user, $transfer_type, $money, $state)
+    {
+        TransferLog::create([
+            'order_no' => $order_no,
+            'api_type' => $api_type,
+            'user_id' => $user->id,
+            'transfer_type' => $transfer_type,
+            'money' => $money,
+            'cash_fee' => 0,
+            'real_money' => abs($money),
+            'before_money' => $user->balance,
+            'after_money' => $user->balance + $money,
+            'state' => $state
+        ]);
+    }
+
     public function betRecord(Request $request)
     {
-
+        $user = Auth::user();
         $data = $request->all();
-        $start = $end = '';
-        if (isset($data['date'])) {
-            switch($data['date']){
-                case 1:
-                    list($start, $end) = [date('Y-m-d 00:00:00',time()), date('Y-m-d 23:59:59',time())];
-                    break;
-                case 2:
-                    list($start, $end) =  [date('Y-m-d 00:00:00',time()-7*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break;  
-                case 3:
-                    list($start, $end) =[date('Y-m-d 00:00:00',time()-15*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break; 
-                case 4:
-                    list($start, $end) =[date('Y-m-d 00:00:00',time()-30*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break;                     
-            }
-        }
+        list($start, $end) = $this->getDateRange($data['date'] ?? null);
         $api_type = $data['api_type'] ?? '';
-    
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first();
-        $pagesize = isset($data['pagesize']) ? $data['pagesize'] : 10 ;
-        
-                $list = GameRecord::where('user_id', $user->id)
-                
-                  ->when($api_type, function ($query) use ($api_type) {
-                        return $query->where('platform_type', strtolower($api_type));
-                    })
-                    ->when($start, function ($query) use ($start) {
-                        return $query->where('created_at', '>=', $start);
-                    })->when($end, function ($query) use ($end) {
-                        return $query->where('created_at', '<=', $end);
-                    })->orderBy('id', 'desc')->select('bet_id','bet_time','platform_type','bet_amount','win_loss','status')->paginate($pagesize);
-                    foreach ($list as $k => $v) {
-                        $list[$k]['Code'] =$this->game_list[$v['platform_type']] ?? '';
-                      
-                    }                        
-           
+        $pagesize = $data['pagesize'] ?? 10;
+
+        $game_list = $this->tgService->getallgamename();
+
+        $list = GameRecord::where('user_id', $user->id)
+            ->when($api_type, function ($query) use ($api_type) {
+                return $query->where('platform_type', strtolower($api_type));
+            })
+            ->when($start, function ($query) use ($start) {
+                return $query->where('created_at', '>=', $start);
+            })
+            ->when($end, function ($query) use ($end) {
+                return $query->where('created_at', '<=', $end);
+            })
+            ->orderBy('id', 'desc')
+            ->select('bet_id', 'bet_time', 'platform_type', 'bet_amount', 'win_loss', 'status')
+            ->paginate($pagesize);
+
+        $list->getCollection()->transform(function ($item) use ($game_list) {
+            $item->Code = $game_list[$item->platform_type] ?? '';
+            return $item;
+        });
+
         return $this->returnMsg(200, $list);
     }
 
-    /**
-     * 获取游戏
-     *
-     * @return void
-     */
+    private function getDateRange($date)
+    {
+        $ranges = [
+            1 => [date('Y-m-d 00:00:00'), date('Y-m-d 23:59:59')],
+            2 => [date('Y-m-d 00:00:00', strtotime('-7 days')), date('Y-m-d 23:59:59')],
+            3 => [date('Y-m-d 00:00:00', strtotime('-15 days')), date('Y-m-d 23:59:59')],
+            4 => [date('Y-m-d 00:00:00', strtotime('-30 days')), date('Y-m-d 23:59:59')],
+        ];
+
+        return $ranges[$date] ?? [null, null];
+    }
+
     public function getdogame()
     {
-        $gamelist = $this->game_list;
-        //$game =[];
-       // foreach ($gamelist as $key=>$val){
-       //     $game[]=['id'=>$key,'name'=>$val];
-       // }
+        $gamelist = $this->tgService->getallgamename();
         unset($gamelist['universal']);
         return $this->returnMsg(200, $gamelist);
     }
 
-
-    /**
-     * 交易记录
-     *
-     * @return void
-     */
-    public function transRecord(Request $request)
+    public function transRecord(TransRecordRequest $request)
     {
-        $data = $request->all();
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first();        
-        $start = $end = '';
-        if (isset($data['date'])) {
-            switch($data['date']){
-                case 1:
-                    list($start, $end) = [date('Y-m-d 00:00:00',time()), date('Y-m-d 23:59:59',time())];
-                    break;
-                case 2:
-                    list($start, $end) =  [date('Y-m-d 00:00:00',time()-7*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break;  
-                case 3:
-                    list($start, $end) =[date('Y-m-d 00:00:00',time()-15*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break; 
-                case 4:
-                    list($start, $end) =[date('Y-m-d 00:00:00',time()-30*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break;                     
-            }
-        }
-        $type = $data['type'];
-        $api_type = $data['api_type'] ?? '';
-        $pagesize = isset($data['pagesize']) ? $data['pagesize'] : 10 ;    
-        $gamelist = $this->gamemoney_list;
+        $data = $request->validated();
+        $user = Auth::user();
 
-        $pay_way =[1=>'银行卡',2 => '',3=>'支付宝',4=>'微信',5 => 'USDT-TRC20',6 => 'USDT-ERC20', 10 => '充值赠送'];
+        list($start, $end) = $this->getDateRange($data['date'] ?? null);
+
+        $list = $this->getRecordByType($data, $user, $start, $end);
+
+        return $this->returnMsg(200, $list);
+    }
+
+    private function getRecordByType($data, $user, $start, $end)
+    {
+        $type = $data['type'];
+        $pagesize = $data['pagesize'] ?? 10;
+
         switch ($type) {
             case 1:
-                $list = Recharge::where('user_id', $user->id)
-                    ->when($start, function ($query) use ($start) {
-                        return $query->where('created_at', '>=', $start);
-                    })->when($end, function ($query) use ($end) {
-                        return $query->where('created_at', '<=', $end);
-                    })->orderBy('id', 'desc')->select('amount','created_at','state','pay_way','out_trade_no')->paginate($pagesize);
-                    foreach ($list as $k => $v) {
-                        $list[$k]['pay_way'] = $pay_way[$v['pay_way']];
-                        $list[$k]['amount'] = abs($v['amount']);
-                    }                        
-                break;
+                return $this->getRechargeRecords($user, $start, $end, $pagesize);
             case 2:
-                $pay_way = [0 => '未记录',1 => '银行卡',2 => 'USDT-TRC20',3 => 'USDT-ERC20'];
-                $list = Withdraw::where('user_id', $user->id)
-                    ->when($start, function ($query) use ($start) {
-                        return $query->where('created_at', '>=', $start);
-                    })->when($end, function ($query) use ($end) {
-                        return $query->where('created_at', '<=', $end);
-                    })->orderBy('id', 'desc')->select('real_money','created_at','state','order_no as out_trade_no','type')->paginate($pagesize);
-                    foreach ($list as $k => $v) {
-                        $list[$k]['pay_way'] = $pay_way[$v['type']];
-                        $list[$k]['amount'] = abs($v['real_money']);
-                    }                       
-                break; 
+                return $this->getWithdrawRecords($user, $start, $end, $pagesize);
             case 3:
-                $list = TransferLog::where('user_id', $user->id)->where('transfer_type', 0)
-                    ->when($start, function ($query) use ($start) {
-                        return $query->where('created_at', '>=', $start);
-                    })->when($end, function ($query) use ($end) {
-                        return $query->where('created_at', '<=', $end);
-                    })->when($api_type,function ($query) use ($api_type){
-                        return $query->where('api_type',$api_type);
-                    })->select('real_money','created_at','state','api_type')->orderBy('id', 'desc')->paginate($pagesize);
-                  
-                    foreach ($list as $k => $v) {
-                        $list[$k]['pay_way'] = $gamelist[$v['api_type']];
-                        $list[$k]['amount'] = abs($v['real_money']);
-                    }                    
-                break; 
+                return $this->getTransferInRecords($user, $start, $end, $data['api_type'] ?? '', $pagesize);
             case 4:
-                $list = TransferLog::where('user_id', $user->id)->whereIn('transfer_type', [1,3])
-                    ->when($start, function ($query) use ($start) {
-                        return $query->where('created_at', '>=', $start);
-                    })->when($end, function ($query) use ($end) {
-                        return $query->where('created_at', '<=', $end);
-                    })->when($api_type,function ($query) use ($api_type){
-                        return $query->where('api_type',$api_type);
-                    })->select('real_money','created_at','state','api_type')->orderBy('id', 'desc')->paginate($pagesize);
-                    foreach ($list as $k => $v) {
-                        if($v['api_type']=='web'){
-                            $list[$k]['pay_way'] ='优惠活动';
-                        }else{
-                            $list[$k]['pay_way'] = $gamelist[$v['api_type']];
-                        }
-                        
-                        $list[$k]['amount'] = abs($v['real_money']);
-                    }
-                break;                 
+                return $this->getTransferOutRecords($user, $start, $end, $data['api_type'] ?? '', $pagesize);
             default:
-                // code...
-                break;
+                return [];
         }
-
-        return $this->returnMsg(200, $list);
-
     }
 
-
-    /**
-     * 交易记录
-     *
-     * @return void
-     */
-    public function rechargeRecord(Request $request)
+    private function getRechargeRecords($user, $start, $end, $pagesize)
     {
-
-        $data = $request->all();
-        $start = $end = '';
-        if (isset($data['time'])) {
-            list($start, $end) = [$data['time'][0], $data['time'][1]];
-        }
-
-        $list = Recharge::where('user_id', Auth::id())
+        $pay_way = [1 => '银行卡', 2 => '', 3 => '支付宝', 4 => '微信', 5 => 'USDT-TRC20', 6 => 'USDT-ERC20', 10 => '充值赠送'];
+        $list = Recharge::where('user_id', $user->id)
             ->when($start, function ($query) use ($start) {
                 return $query->where('created_at', '>=', $start);
-            })->when($end, function ($query) use ($end) {
+            })
+            ->when($end, function ($query) use ($end) {
                 return $query->where('created_at', '<=', $end);
-            })->orderBy('id', 'desc')->paginate(10);
-        foreach ($list as $k => $v) {
-            //$list[$k]['state'] = $this->state[$v->state];
+            })
+            ->orderBy('id', 'desc')
+            ->select('amount', 'created_at', 'state', 'pay_way', 'out_trade_no')
+            ->paginate($pagesize);
 
-            $list[$k]['type'] = ($v->pay_way == 10) ? '充值赠送' : '充值';
-        }
-        return $this->returnMsg(200, $list);
+        $list->getCollection()->transform(function ($item) use ($pay_way) {
+            $item->pay_way = $pay_way[$item->pay_way] ?? '';
+            $item->amount = abs($item->amount);
+            return $item;
+        });
 
+        return $list;
     }
 
-
-    /**
-     * 交易记录
-     *
-     * @return void
-     */
-    public function WithdrawRecord(Request $request)
+    private function getWithdrawRecords($user, $start, $end, $pagesize)
     {
-        $data = $request->all();
-        $start = $end = '';
-        if (isset($data['time'])) {
-            list($start, $end) = [$data['time'][0], $data['time'][1]];
-        }
-
-
-        $list = Withdraw::where('user_id', Auth::id())
+        $pay_way = [0 => '未记录', 1 => '银行卡', 2 => 'USDT-TRC20', 3 => 'USDT-ERC20'];
+        $list = Withdraw::where('user_id', $user->id)
             ->when($start, function ($query) use ($start) {
                 return $query->where('created_at', '>=', $start);
-            })->when($end, function ($query) use ($end) {
+            })
+            ->when($end, function ($query) use ($end) {
                 return $query->where('created_at', '<=', $end);
-            })->orderBy('id', 'desc')->paginate(10);
-        foreach ($list as $k => $v) {
-            $list[$k]['state'] = $this->state[$v->state];
-            $list[$k]['out_trade_no'] = $v->order_sn;
-            $list[$k]['type'] = '提现';
+            })
+            ->orderBy('id', 'desc')
+            ->select('real_money', 'created_at', 'state', 'order_no as out_trade_no', 'type')
+            ->paginate($pagesize);
 
-        }
-        return $this->returnMsg(200, $list);
+        $list->getCollection()->transform(function ($item) use ($pay_way) {
+            $item->pay_way = $pay_way[$item->type] ?? '';
+            $item->amount = abs($item->real_money);
+            return $item;
+        });
 
+        return $list;
     }
 
-    public function userbalancelist(Request $request){
-        $data = $request->all();
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first();          
-        $Api = Api::where('state',1)->orderBy('order_by', 'asc')->get()->toArray();
-		$data = array();
-        foreach($Api as $key => $v){
-			$User_Api = User_Api::where('api_code',$v['api_code'])->where('user_id',$user->id)->first();
-            $data[$key]['balance'] = $User_Api ? sprintf("%.2f",$User_Api->api_money) : 0;
-			$data[$key]['name'] = $v['api_name'];
-			$data[$key]['platname'] = $v['api_code'];
-		}
+    private function getTransferInRecords($user, $start, $end, $api_type, $pagesize)
+    {
+        $gamelist = $this->tgService->getallmoneygamelist();
+        $list = TransferLog::where('user_id', $user->id)->where('transfer_type', 0)
+            ->when($start, function ($query) use ($start) {
+                return $query->where('created_at', '>=', $start);
+            })
+            ->when($end, function ($query) use ($end) {
+                return $query->where('created_at', '<=', $end);
+            })
+            ->when($api_type, function ($query) use ($api_type) {
+                return $query->where('api_type', $api_type);
+            })
+            ->select('real_money', 'created_at', 'state', 'api_type')
+            ->orderBy('id', 'desc')
+            ->paginate($pagesize);
+
+        $list->getCollection()->transform(function ($item) use ($gamelist) {
+            $item->pay_way = $gamelist[$item->api_type] ?? '';
+            $item->amount = abs($item->real_money);
+            return $item;
+        });
+
+        return $list;
+    }
+
+    private function getTransferOutRecords($user, $start, $end, $api_type, $pagesize)
+    {
+        $gamelist = $this->tgService->getallmoneygamelist();
+        $list = TransferLog::where('user_id', $user->id)->whereIn('transfer_type', [1, 3])
+            ->when($start, function ($query) use ($start) {
+                return $query->where('created_at', '>=', $start);
+            })
+            ->when($end, function ($query) use ($end) {
+                return $query->where('created_at', '<=', $end);
+            })
+            ->when($api_type, function ($query) use ($api_type) {
+                return $query->where('api_type', $api_type);
+            })
+            ->select('real_money', 'created_at', 'state', 'api_type')
+            ->orderBy('id', 'desc')
+            ->paginate($pagesize);
+
+        $list->getCollection()->transform(function ($item) use ($gamelist) {
+            $item->pay_way = ($item->api_type == 'web') ? '优惠活动' : ($gamelist[$item->api_type] ?? '');
+            $item->amount = abs($item->real_money);
+            return $item;
+        });
+
+        return $list;
+    }
+
+    public function userbalancelist()
+    {
+        $user = Auth::user();
+        $Api = Api::where('state', 1)->orderBy('order_by', 'asc')->get();
+        $data = [];
+        foreach ($Api as $key => $v) {
+            $User_Api = User_Api::where('api_code', $v->api_code)->where('user_id', $user->id)->first();
+            $data[$key]['balance'] = $User_Api ? sprintf("%.2f", $User_Api->api_money) : 0;
+            $data[$key]['name'] = $v->api_name;
+            $data[$key]['platname'] = $v->api_code;
+        }
         return $this->returnMsg(200, $data);
     }
-    public function userapimoney(Request $request)   
+
+    public function userapimoney(Request $request, $api_code)
     {
-        $api_code = $request->route('api_code');
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first();
-		$User_Api = User_Api::where('api_code',$api_code)->where('user_id',$user->id)->first();
-		$tg = New TgService;
-		if(!$User_Api){
-			$result = $tg->register($api_code,$user->username);
-            if($result['code'] != 200){
-				return $this->returnMsg(201, '', $result['message']);
-			}
-			$arr = [
-				'user_id' => $user->id,
-				'api_user' => $user->username,
-				'api_pass' => 123456,
-				'api_code' => $api_code,
-			];
-			$User_Api = User_Api::create($arr);		    
-		}        
-        $result = $tg->balance($api_code,$user->username);
-		if($result['code'] != 200){
-			return $this->returnMsg(201, '', $result['message']);
-		}		
-		$User_Api->api_money = $result['data'];
-		$User_Api->save();		
-        return $this->returnMsg(200,['balance' => $result['data']]);      
-    } 
-    public function uptransferstatus(Request $request){
-            $data = $request->all();
-            $token = $request->header('authorization');
-            $token = str_replace('Bearer ','',$token) ;
-            $user = User::where('api_token',$token)->first();  
-            $user->update($data);        
-            return $this->returnMsg(200, '', '申请成功');
+        $user = Auth::user();
+        $this->registerApiIfNecessary($api_code, $user);
+
+        $result = $this->tgService->balance($api_code, $user->username);
+        if ($result['code'] != 200) {
+            return $this->returnMsg(201, '', $result['message']);
+        }
+
+        $userApi = User_Api::where('api_code', $api_code)->where('user_id', $user->id)->first();
+        $userApi->api_money = $result['data'];
+        $userApi->save();
+
+        return $this->returnMsg(200, ['balance' => $result['data']]);
     }
 
-    public function fanshui(Request $request){
+    public function uptransferstatus(Request $request)
+    {
+        $user = Auth::user();
+        $user->update($request->all());
+        return $this->returnMsg(200, '', '申请成功');
+    }
+
+    public function fanshui(Request $request)
+    {
+        $user = Auth::user();
         $data = $request->all();
-     $token = $request->header('authorization');
-     $token = str_replace('Bearer ','',$token) ;
-            $user = User::where('api_token',$token)->first();         
-        $start = $end = '';
-        $pagesize = isset($data['pagesize']) ? $data['pagesize'] : 10 ;
-        if (isset($data['date'])) {
-            switch($data['date']){
-                case 1:
-                    list($start, $end) = [date('Y-m-d 00:00:00',time()), date('Y-m-d 23:59:59',time())];
-                    break;
-                case 2:
-                    list($start, $end) =  [date('Y-m-d 00:00:00',time()-7*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break;  
-                case 3:
-                    list($start, $end) =[date('Y-m-d 00:00:00',time()-15*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break; 
-                case 4:
-                    list($start, $end) =[date('Y-m-d 00:00:00',time()-30*60*60*24), date('Y-m-d 23:59:59',time())];
-                    break;                     
-            }
-        }
-        $api_type = $data['api_type'];
-        $type =  $data['type'];
+        list($start, $end) = $this->getDateRange($data['date'] ?? null);
+        $pagesize = $data['pagesize'] ?? 10;
+        $api_type = $data['api_type'] ?? '';
+        $type = $data['type'] ?? '';
 
+        $game_list = $this->tgService->getallgamename();
 
-        $lists = TransferLog::where('user_id', $user->id)->where('transfer_type', 6)
+        $lists = TransferLog::where('user_id', $user->id)
+            ->where('transfer_type', 6)
             ->when($start, function ($query) use ($start) {
                 return $query->where('created_at', '>=', $start);
-            })->when($end, function ($query) use ($end) {
+            })
+            ->when($end, function ($query) use ($end) {
                 return $query->where('created_at', '<=', $end);
-            })->when($api_type, function ($query) use ($api_type) {
-                return $query->where('platform_type', '=', $api_type);
-            })->when($type, function ($query) use ($type) {
-                return $query->where('state', '=', ($type-1));
-            })->orderBy('id', 'desc')->paginate($pagesize);
+            })
+            ->when($api_type, function ($query) use ($api_type) {
+                return $query->where('platform_type', $api_type);
+            })
+            ->when($type, function ($query) use ($type) {
+                return $query->where('state', $type - 1);
+            })
+            ->orderBy('id', 'desc')
+            ->paginate($pagesize);
 
-        foreach ($lists as $k => $v) {
-            $lists[$k]['gamename'] = $this->game_list[$v['platform_type']];
-        }
-         $list['list'] = $lists;
-         $list['jisuan'] = TransferLog::where('user_id', $user->id)->where('transfer_type', 6)->where('state', 1)->sum('real_money');
-         $list['nojisuan'] = TransferLog::where('user_id',  $user->id)->where('transfer_type', 6)->where('state', 0)->sum('real_money');
+        $lists->getCollection()->transform(function ($item) use ($game_list) {
+            $item->gamename = $game_list[$item->platform_type] ?? '';
+            return $item;
+        });
+
+        $list['list'] = $lists;
+        $list['jisuan'] = TransferLog::where('user_id', $user->id)->where('transfer_type', 6)->where('state', 1)->sum('real_money');
+        $list['nojisuan'] = TransferLog::where('user_id', $user->id)->where('transfer_type', 6)->where('state', 0)->sum('real_money');
+
         return $this->returnMsg(200, $list);
     }
 
     public function dofanshui(Request $request)
     {
-        $data = $request->all();
-         $token = $request->header('authorization');
-         $token = str_replace('Bearer ','',$token) ;
-            $user = User::where('api_token',$token)->first();
-                $betlist = TransferLog::where('user_id', $user->id)->where('state', 0)->where('transfer_type', 6)->select('betid')->get();
-                $userfanshui = TransferLog::where('user_id', $user->id)->where('state', 0)->where('transfer_type', 6)->sum('real_money');
-                if ($userfanshui) {
-                    $userinfo = Users::where('id', $user->id)->lockForUpdate()->first();
-                    $userinfo->balance = $userinfo->balance + $userfanshui;
-                    $userinfo->save();
-                    TransferLog::where('user_id', $user->id)
-                        ->where('state', 0)
-                        ->update(['state' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
-                    $betidarray=[];
-                    foreach ($betlist as $val){
-                        $betidarray[]=$val['betid'];
-                    }
-                    
-                    GameRecord::where('user_id', $user->id)->whereIn('bet_id', $betidarray)->update(['is_back' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
-                    
-                    return $this->returnMsg(200, '', '成功领取');
-                } else {
-                    return $this->returnMsg(202, '', '没有可领取的返水');
-                }
+        $user = Auth::user();
+        $userfanshui = TransferLog::where('user_id', $user->id)->where('state', 0)->where('transfer_type', 6)->sum('real_money');
 
+        if ($userfanshui > 0) {
+            DB::transaction(function () use ($user, $userfanshui) {
+                $user->increment('balance', $userfanshui);
+
+                $betlist = TransferLog::where('user_id', $user->id)->where('state', 0)->where('transfer_type', 6)->pluck('betid');
+
+                TransferLog::where('user_id', $user->id)
+                    ->where('state', 0)
+                    ->update(['state' => 1, 'updated_at' => now()]);
+
+                GameRecord::where('user_id', $user->id)->whereIn('bet_id', $betlist)->update(['is_back' => 1, 'updated_at' => now()]);
+            });
+
+            return $this->returnMsg(200, '', '成功领取');
+        }
+
+        return $this->returnMsg(202, '', '没有可领取的返水');
     }
 
     public function banklist()
     {
-        $banklist = Bank::where('state', 1)->get();
-        foreach ($banklist as &$val){
-            $val->ico= env('APP_URL').'/uploads/'. $val->bank_img;    
-        }         
-         return $this->returnMsg(200, $banklist);
+        $banklist = Bank::where('state', 1)->get()->map(function ($bank) {
+            $bank->ico = config('app.url') . '/uploads/' . $bank->bank_img;
+            return $bank;
+        });
+
+        return $this->returnMsg(200, $banklist);
     }
-    
+
     public function getpaybank()
     {
-		$cardlist = PaySetting::where('state',1)->get();
-		foreach ($cardlist as &$val){
-			if($val->bank_data->bank_name!='USDT' || $val->bank_data->bank_name!='银行类型后台添加'){
-				$val->ico= env('APP_URL').'/uploads/'. $val->bank_data->bank_img; 
-			}else{
-				$val->ico='';
-			}
-		}        
-         return $this->returnMsg(200, $cardlist);
-    }    
-
-    public function doactivity(Request $request){
-            $data = $request->all();
-             $token = $request->header('authorization');
-             $token = str_replace('Bearer ','',$token) ;
-            $user = User::where('api_token',$token)->first(); 
-
-            $activity = Activity::where('id', $data['activityid'])->first();
-            if(empty($activity)){
-                return $this->returnMsg(202, '', '活动不存在');
+        $cardlist = PaySetting::with('bank_data')->where('state', 1)->get()->map(function ($card) {
+            if (isset($card->bank_data) && !in_array($card->bank_data->bank_name, ['USDT', '银行类型后台添加'])) {
+                $card->ico = config('app.url') . '/uploads/' . $card->bank_data->bank_img;
+            } else {
+                $card->ico = '';
             }
+            return $card;
+        });
 
-            $isapple = ActivityApply::where("user_id",$user->id)->where('activity_id',$data['activityid'])->first();
-            if($isapple){
-                if($isapple->state==1){
-                    return $this->returnMsg(202, '', '您已经申请过，等待管理员审核');
-                }
-                if($isapple->state==2){
-                    return $this->returnMsg(202, '', '您已经申请过，已审核通过');
-                }
-                if($isapple->state==3){
-                    return $this->returnMsg(202, '', '您已经申请过，审核未通过');
-                }
-            }
-
-            $arr['activity_id'] = $data['activityid'];
-            $arr['user_id'] = $user->id;
-            $arr['state'] = 1;
-            $arr['created_at'] = time();
-            $arr['updated_at'] = time();
-            if(ActivityApply::create($arr)){
-                return $this->returnMsg(200, '', '申请成功');
-            }else{
-                return $this->returnMsg(200, '', '申请失败');
-            }
-
+        return $this->returnMsg(200, $cardlist);
     }
-    
+
+    public function doactivity(Request $request)
+    {
+        $user = Auth::user();
+        $activity_id = $request->input('activityid');
+
+        $activity = Activity::find($activity_id);
+        if (!$activity) {
+            return $this->returnMsg(202, '', '活动不存在');
+        }
+
+        $isapple = ActivityApply::where("user_id", $user->id)->where('activity_id', $activity_id)->first();
+        if ($isapple) {
+            $messages = [
+                1 => '您已经申请过，等待管理员审核',
+                2 => '您已经申请过，已审核通过',
+                3 => '您已经申请过，审核未通过',
+            ];
+            return $this->returnMsg(202, '', $messages[$isapple->state] ?? '');
+        }
+
+        ActivityApply::create([
+            'activity_id' => $activity_id,
+            'user_id' => $user->id,
+            'state' => 1,
+        ]);
+
+        return $this->returnMsg(200, '', '申请成功');
+    }
+
     public function activityApplyLog(Request $request)
     {
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first(); 
-        $limit = $request->input('limit') ?? 10;
-        $list = ActivityApply::where("user_id",$user->id)->paginate($limit);
-        foreach ($list as $k => $v) {
-            $list[$k]->activity_name = Activity::find($v->activity_id)->title;
-        }
-        return $this->returnMsg(200,$list);
-    }
-    /**
-     * 用户所有银行卡
-     */
-    public function getAllUserCard(Request $request)
-    {
-     $token = $request->header('authorization');
-     $token = str_replace('Bearer ','',$token) ;
-            $user = User::where('api_token',$token)->first(); 
-        $list = UserCard::where('user_id', $user->id)->get();
-        foreach ($list as &$val){
-			if($val->bank!='USDT' && $val->bank != 'ebpay'){
-				$banklist = Bank::where('bank_name', $val->bank)->first();
-				$val->ico= env('APP_URL').'/uploads/'. $banklist->bank_img;    
-			}else{
-				$val->ico='';
-			}
-        }
+        $user = Auth::user();
+        $limit = $request->input('limit', 10);
+        $list = ActivityApply::with('activity:id,title')->where("user_id", $user->id)->paginate($limit);
+
         return $this->returnMsg(200, $list);
     }
 
-    /**
-     * 系统银行卡信息
-     */
+    public function getAllUserCard()
+    {
+        $user = Auth::user();
+        $list = UserCard::where('user_id', $user->id)->get()->map(function ($card) {
+            if (!in_array($card->bank, ['USDT', 'ebpay'])) {
+                $banklist = Bank::where('bank_name', $card->bank)->first();
+                if($banklist){
+                    $card->ico = config('app.url') . '/uploads/' . $banklist->bank_img;
+                }
+            } else {
+                $card->ico = '';
+            }
+            return $card;
+        });
+
+        return $this->returnMsg(200, $list);
+    }
+
     public function systemBankCardInfo(Request $request)
     {
-        $data = $request->all();
-        if($data['payType']!=1){
-            $card = PaySetting::where('state', 1)->where('bank_id','>', 1)->first();
-        }else{
-            $card = PaySetting::where('state', 1)->where('bank_id', 1)->first();
+        $payType = $request->input('payType');
+        $query = PaySetting::where('state', 1);
+
+        if ($payType != 1) {
+            $query->where('bank_id', '>', 1);
+        } else {
+            $query->where('bank_id', 1);
         }
 
+        $card = $query->first();
         return $this->returnMsg(200, $card);
     }
-    
 
     public function gameslist(Request $request)
     {
-        $data = $request->all();
-        $tg = new TgService;
-        $gamelist = $tg->gameslist($data['gamecode']);
-        $gamelist = $gamelist['data'];
-       return $this->returnMsg(200, $gamelist);
+        $gamecode = $request->input('gamecode');
+        $gamelist = $this->tgService->gameslist($gamecode);
+        return $this->returnMsg(200, $gamelist['data'] ?? []);
     }
-    
-    public function  messagecenter(Request $request){
-     $token = $request->header('authorization');
-     $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first(); 
-        $map['user_id']=0;
-        $map['vip_id']=0;
-        $map['isagent']=0;
-        
-        $map1['isagent']=$user->agent;
-        $map2['vip_id']=$user->vip;
-        $map3['user_id']=$user->id;
-        
-        $data = $request->all();
-        
-        $list = Message::where('type',$data['type'])->whereOr($map)->whereOr($map1)->whereOr($map2)->whereOr($map3)->paginate(10);
-        foreach ($list as $k => &$v) {
-            $user_message = UserMessage::where('message_id', $v->id)->count();
-            $v->is_read = $user_message ?? 0;
-            $v->desc = mb_substr(strip_tags($v->content),0,20,'utf-8');
-        }        
-       
-       return $this->returnMsg(200, $list);
-    }  
-    
-    public function  message(Request $request){
-     $token = $request->header('authorization');
-     $token = str_replace('Bearer ','',$token) ;
-            $user = User::where('api_token',$token)->first(); 
-        $map['user_id']=0;
-        $map['vip_id']=0;
-        $map['isagent']=0;
-        $map1['isagent']=$user->agent;
-        $map2['vip_id']=$user->vip;
-        $map3['user_id']=$user->id;
-        
-        $data = $request->all();
-        
-        $list = Message::where('id',$data['id'])->whereOr($map)->whereOr($map1)->whereOr($map2)->whereOr($map3)->first();
-               
-       
-       return $this->returnMsg(200, $list);
-    }   
-    
+
+    public function messagecenter(Request $request)
+    {
+        $user = Auth::user();
+        $type = $request->input('type');
+
+        $list = Message::where('type', $type)
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', 0)
+                    ->orWhere('vip_id', $user->vip)
+                    ->orWhere('isagent', $user->is_agent)
+                    ->orWhere('user_id', $user->id);
+            })
+            ->paginate(10);
+
+        $list->getCollection()->transform(function ($item) use ($user) {
+            $item->is_read = UserMessage::where('message_id', $item->id)->where('user_id', $user->id)->exists();
+            $item->desc = mb_substr(strip_tags($item->content), 0, 20, 'utf-8');
+            return $item;
+        });
+
+        return $this->returnMsg(200, $list);
+    }
+
+    public function message(Request $request)
+    {
+        $user = Auth::user();
+        $id = $request->input('id');
+
+        $list = Message::where('id', $id)
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', 0)
+                    ->orWhere('vip_id', $user->vip)
+                    ->orWhere('isagent', $user->is_agent)
+                    ->orWhere('user_id', $user->id);
+            })
+            ->first();
+
+        return $this->returnMsg(200, $list);
+    }
+
     public function app()
     {
-        $ios_download_url = SystemConfig::getValue('ios_download_url');
-        $ios_download_qrcode = SystemConfig::getValue('ios_download_qrcode');
-        $ios_download_qrcode = env('APP_URL').'/uploads/'.$ios_download_qrcode;
-        $h5_url = env('WAP_URL');
-        $title = SystemConfig::getValue('site_title') ?? 'TG娱乐城';
-        $redpacket_switch = SystemConfig::getValue('redpacket');
-        $site_state = SystemConfig::getValue('site_state');
-        $fanshui = SystemConfig::getValue('fanshui');
-        $index_modal = SystemConfig::getValue('isclose');
-        $repair_tips = SystemConfig::getValue('repair_tips');
-        $webcontent = SystemConfig::getValue('webcontent');
-        $site_logo = SystemConfig::getValue('site_logo');
-        $site_logo = env('APP_URL').'/uploads/'.$site_logo;
-        return $this->returnMsg(200,compact('ios_download_qrcode','ios_download_url','h5_url','title','redpacket_switch','site_state','fanshui','index_modal','repair_tips','webcontent','site_logo'));
+        $configKeys = [
+            'ios_download_url', 'ios_download_qrcode', 'site_title',
+            'redpacket', 'site_state', 'fanshui', 'isclose',
+            'repair_tips', 'webcontent', 'site_logo'
+        ];
+        $config = SystemConfig::whereIn('key', $configKeys)->pluck('value', 'key');
+
+        $data = [
+            'ios_download_qrcode' => config('app.url') . '/uploads/' . ($config['ios_download_qrcode'] ?? ''),
+            'ios_download_url' => $config['ios_download_url'] ?? '',
+            'h5_url' => config('app.wap_url'),
+            'title' => $config['site_title'] ?? 'TG娱乐城',
+            'redpacket_switch' => $config['redpacket'] ?? null,
+            'site_state' => $config['site_state'] ?? null,
+            'fanshui' => $config['fanshui'] ?? null,
+            'index_modal' => $config['isclose'] ?? null,
+            'repair_tips' => $config['repair_tips'] ?? null,
+            'webcontent' => $config['webcontent'] ?? null,
+            'site_logo' => config('app.url') . '/uploads/' . ($config['site_logo'] ?? ''),
+        ];
+
+        return $this->returnMsg(200, $data);
     }
-    
-    
+
     public function applyagentdo(Request $request)
     {
-        $data = $request->all();
-        $token = $request->header('authorization');
-        $token = str_replace('Bearer ','',$token) ;
-        $user = User::where('api_token',$token)->first(); 
-        
-        $useragent = AgentApply::where('user_id',$user->id)->first();
-         if ($useragent)return $this->returnMsg(500, '', '您已申请过代理'); 
+        $user = Auth::user();
 
-            $arr = [
-                'user_id' => $user->id,
-                'apply_info' => $data['apply_info'],
-                'state' => 1,
-                'mobile' => $data['mobile'],
-            ];
-        if($res = AgentApply::create($arr)){
-          return $this->returnMsg(200, '', '申请成功');
-        }else{
-            return $this->returnMsg(500, '', '申请失败');
+        if (AgentApply::where('user_id', $user->id)->exists()) {
+            return $this->returnMsg(500, '', '您已申请过代理');
         }
-    } 
-    
+
+        AgentApply::create([
+            'user_id' => $user->id,
+            'apply_info' => $request->input('apply_info'),
+            'state' => 1,
+            'mobile' => $request->input('mobile'),
+        ]);
+
+        return $this->returnMsg(200, '', '申请成功');
+    }
+
     public function getAgentLoginUrl()
     {
-        return $this->returnMsg(200,['url' => env('AGENT_LOGIN')]);
+        return $this->returnMsg(200, ['url' => config('app.agent_login')]);
     }
-    
-    public function getVisitUrl(Request $request) {
-        $origin = $_SERVER['HTTP_ORIGIN'];
-        if($this->isMobile()){
-            
-            $wapurl = env("WAP_URL");
+
+    public function getVisitUrl(Request $request)
+    {
+        $origin = $request->header('origin');
+        $isMobile = $this->isMobile($request->header('user-agent'));
+
+        if ($isMobile) {
+            $wapurl = config('app.wap_url');
             if ($origin == $wapurl) {
-                return $this->returnMsg(500,[],'wap');
-            } else {
-                 return $this->returnMsg(200, ['url' => $wapurl]);
+                return $this->returnMsg(500, [], 'wap');
             }
-           
-        } else {
-            $url = env("PC_URL");
-            if ($origin == $url) {
-                return $this->returnMsg(500,[],'pc');
-            } else {
-                 return $this->returnMsg(200, ['url' => $url]);
-            }
+            return $this->returnMsg(200, ['url' => $wapurl]);
         }
+
+        $url = config('app.pc_url');
+        if ($origin == $url) {
+            return $this->returnMsg(500, [], 'pc');
+        }
+        return $this->returnMsg(200, ['url' => $url]);
     }
-    
+
+    private function isMobile($userAgent)
+    {
+        $regex = '/Mobi|Android|iPhone/i';
+        return preg_match($regex, $userAgent);
+    }
+
     public function getAllPlat()
     {
-        $vaild_plat = GameList::where('app_state',1)->where('is_top',1)->select('platform_name')->distinct()->pluck('platform_name')->toArray();
-        $res = array_unique($vaild_plat);
-        return $this->returnMsg(200,$res);
+        $vaild_plat = GameList::where('app_state', 1)->where('is_top', 1)->distinct()->pluck('platform_name');
+        return $this->returnMsg(200, $vaild_plat);
     }
-    
+
     public function getAllGameList(Request $request)
     {
-        $platform = $request->input('platform') ?? '';
-        $category = $request->input('category') ?? '';
-        $list = GameList::when($platform,function ($query) use ($platform){
-            return $query->where('platform_name',$platform);
-        })->when($category,function ($query) use ($category){
-            return $query->where('category_id',$category);
-        })->where('is_top',1)->where('site_state',1)->select('name','platform_name','category_id','game_code','app_state','check_yes_img','check_no_img','api_logo_img','mobile_img')->orderBy('order_by','asc')->get()->toArray();
-		foreach($list as $key => $value){
-			$data = Api::where('api_code',$value['platform_name'])->where('state',1)->first();
-			if(!$data){
-				unset($list[$key]);
-			}
-		}
-        $list = array_merge($list);
-        return $this->returnMsg(200,$list);
+        $platform = $request->input('platform');
+        $category = $request->input('category');
+
+        $list = GameList::when($platform, function ($query) use ($platform) {
+            return $query->where('platform_name', $platform);
+        })
+            ->when($category, function ($query) use ($category) {
+                return $query->where('category_id', $category);
+            })
+            ->where('is_top', 1)
+            ->where('site_state', 1)
+            ->select('name', 'platform_name', 'category_id', 'game_code', 'app_state', 'check_yes_img', 'check_no_img', 'api_logo_img', 'mobile_img')
+            ->orderBy('order_by', 'asc')
+            ->get()
+            ->filter(function ($value) {
+                return Api::where('api_code', $value['platform_name'])->where('state', 1)->exists();
+            })
+            ->values()
+            ->all();
+
+        return $this->returnMsg(200, $list);
     }
-    
+
     public function getAppUrl()
     {
-        $url = env('APP_URL');
-        return $this->returnMsg(200,compact('url'));
+        return $this->returnMsg(200, ['url' => config('app.url')]);
     }
-    
 }

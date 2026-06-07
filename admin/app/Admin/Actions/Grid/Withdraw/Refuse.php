@@ -16,7 +16,7 @@ class Refuse extends RowAction
     /**
      * @return string
      */
-	protected $title = '拒绝';
+	protected $title = 'Từ chối';
 
     /**
      * Handle the action request.
@@ -36,7 +36,7 @@ class Refuse extends RowAction
         $user->save();
 
         return $this->response()
-            ->success('审核成功')
+            ->success('Thao tác thành công')
             ->refresh();
     }
 
@@ -45,7 +45,7 @@ class Refuse extends RowAction
 	 */
 	public function confirm()
 	{
-		// return ['Confirm?', 'contents'];
+		return ['Xác nhận từ chối?', ''];
 	}
 
     /**

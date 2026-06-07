@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Recharge;
 use App\Models\User;
 use App\Models\PaymentChannel;
+use App\Services\TransactionService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -27,7 +28,7 @@ class PaymentService
     public function createPayment()
     {
         try {
-            // 创建充值记录
+            // Tạo bản ghi nạp tiền
             $recharge = Recharge::create([
                 'order_no' => $this->orderNo,
                 'user_id' => $this->user->id,
@@ -37,10 +38,10 @@ class PaymentService
                 'info' => $this->channel->name
             ]);
 
-            // 根据支付渠道创建支付
+            // Tạo thanh toán theo kênh thanh toán
             $paymentData = $this->createChannelPayment($recharge);
 
-            // 缓存支付信息
+            // Cache thông tin thanh toán
             $this->cachePaymentInfo($recharge, $paymentData);
 
             return [
@@ -51,10 +52,10 @@ class PaymentService
                 ]
             ];
         } catch (\Exception $e) {
-            Log::error('创建支付失败: ' . $e->getMessage());
+            Log::error('Tạo thanh toán thất bại: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => '创建支付失败'
+                'message' => 'Tạo thanh toán thất bại'
             ];
         }
     }
@@ -69,13 +70,13 @@ class PaymentService
             case 'bank':
                 return $this->createBankPayment($recharge);
             default:
-                throw new \Exception('不支持的支付渠道');
+                throw new \Exception('Kênh thanh toán không được hỗ trợ');
         }
     }
 
     protected function createAlipayPayment($recharge)
     {
-        // 支付宝支付逻辑
+        // Logic thanh toán Alipay
         $config = [
             'app_id' => $this->channel->config['app_id'],
             'private_key' => $this->channel->config['private_key'],
@@ -87,16 +88,16 @@ class PaymentService
         $order = [
             'out_trade_no' => $this->orderNo,
             'total_amount' => $this->amount,
-            'subject' => '充值' . $this->amount . '元',
+            'subject' => 'Nạp tiền ' . $this->amount . ' đồng',
         ];
 
-        // 调用支付宝SDK创建支付
+        // Gọi SDK Alipay để tạo thanh toán
         return $this->callAlipaySDK($config, $order);
     }
 
     protected function createWechatPayment($recharge)
     {
-        // 微信支付逻辑
+        // Logic thanh toán WeChat
         $config = [
             'app_id' => $this->channel->config['app_id'],
             'mch_id' => $this->channel->config['mch_id'],
@@ -106,17 +107,17 @@ class PaymentService
 
         $order = [
             'out_trade_no' => $this->orderNo,
-            'total_fee' => $this->amount * 100, // 转换为分
-            'body' => '充值' . $this->amount . '元',
+            'total_fee' => $this->amount * 100, // Chuyển đổi sang xu
+            'body' => 'Nạp tiền ' . $this->amount . ' đồng',
         ];
 
-        // 调用微信支付SDK创建支付
+        // Gọi SDK WeChat để tạo thanh toán
         return $this->callWechatSDK($config, $order);
     }
 
     protected function createBankPayment($recharge)
     {
-        // 银行卡支付逻辑
+        // Logic thanh toán qua ngân hàng
         return [
             'bank_name' => $this->channel->config['bank_name'],
             'account_name' => $this->channel->config['account_name'],
@@ -150,33 +151,44 @@ class PaymentService
             $paymentInfo = Cache::get($cacheKey);
 
             if (!$paymentInfo) {
-                throw new \Exception('支付信息不存在或已过期');
+                throw new \Exception('Thông tin thanh toán không tồn tại hoặc đã hết hạn');
             }
 
-            // 验证支付回调
+            // Xác minh callback thanh toán
             if (!$this->verifyPaymentCallback($data)) {
-                throw new \Exception('支付验证失败');
+                throw new \Exception('Xác minh thanh toán thất bại');
             }
 
-            // 更新充值记录
+            // Cập nhật bản ghi nạp tiền
             $recharge = Recharge::find($paymentInfo['recharge_id']);
-            $recharge->state = 2; // 支付成功
+            if ($recharge->state != 0) { // Kiểm tra xem đơn hàng đã được xử lý chưa
+                return [
+                    'success' => true,
+                    'message' => 'Đơn hàng đã được xử lý'
+                ];
+            }
+            $recharge->state = 2; // Thanh toán thành công
             $recharge->save();
 
-            // 更新用户余额
+            // Cập nhật số dư người dùng và tạo bản ghi giao dịch
             $user = User::find($paymentInfo['user_id']);
-            $user->balance += $paymentInfo['amount'];
-            $user->save();
+            $transactionService = resolve(TransactionService::class);
+            $transactionService->createTransaction(
+                $user,
+                'deposit',
+                $paymentInfo['amount'],
+                'Nạp tiền qua ' . $recharge->info
+            );
 
-            // 清除缓存
+            // Xóa cache
             Cache::forget($cacheKey);
 
             return [
                 'success' => true,
-                'message' => '支付处理成功'
+                'message' => 'Xử lý thanh toán thành công'
             ];
         } catch (\Exception $e) {
-            Log::error('处理支付回调失败: ' . $e->getMessage());
+            Log::error('Xử lý callback thanh toán thất bại: ' . $e->getMessage());
             return [
                 'success' => false,
                 'message' => $e->getMessage()
@@ -200,19 +212,19 @@ class PaymentService
 
     protected function verifyAlipayCallback($data)
     {
-        // 支付宝回调验证逻辑
+        // Logic xác minh callback Alipay
         return true;
     }
 
     protected function verifyWechatCallback($data)
     {
-        // 微信支付回调验证逻辑
+        // Logic xác minh callback WeChat
         return true;
     }
 
     protected function verifyBankCallback($data)
     {
-        // 银行卡支付验证逻辑
+        // Logic xác minh callback ngân hàng
         return true;
     }
-} 
+}

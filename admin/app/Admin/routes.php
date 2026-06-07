@@ -46,6 +46,9 @@ Route::group([
     $router->resource('agent-applys','AgentApplyController');
     $router->resource('agent-commission','AgentCommissionController');
     $router->resource('agent-settlements','AgentSettlementController');
+    $router->resource('transactions', 'TransactionController');
+    $router->resource('agent-levels', 'AgentLevelController');
+
 
     $router->resource('userredpacket','UserredpacketController');
     $router->resource('usercard','UserCardController');

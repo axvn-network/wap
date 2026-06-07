@@ -9,13 +9,14 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\Recharge;
+use Illuminate\Support\Facades\Log;
 
 class Refuse extends RowAction
 {
     /**
      * @return string
      */
-	protected $title = '拒绝';
+	protected $title = 'Từ chối';
 
     /**
      * Handle the action request.
@@ -28,11 +29,23 @@ class Refuse extends RowAction
     {
         $id = $this->getKey();
         $model = Recharge::find($id);
-        $model->state = 3;
+        
+        if (!$model || $model->state != 1) {
+            return $this->response()->error('Đơn nạp không tồn tại hoặc đã được xử lý');
+        }
+
+        $model->state = 3; // Đã từ chối
         $model->save();
 
-        return $this->response()->success('审核成功')->refresh();
+        Log::channel('backend')->warning("Từ chối đơn nạp tiền", [
+            'admin_id' => \Admin::user()->id ?? 0,
+            'user_id' => $model->user_id,
+            'amount' => $model->amount,
+            'order_no' => $model->order_no,
+            'ip' => $request->ip()
+        ]);
 
+        return $this->response()->success('Đã từ chối đơn nạp')->refresh();
     }
 
     /**
@@ -40,7 +53,7 @@ class Refuse extends RowAction
 	 */
 	public function confirm()
 	{
-		// return ['Confirm?', 'contents'];
+		return ['Xác nhận từ chối đơn nạp?', 'Hành động này không thể hoàn tác.'];
 	}
 
     /**

@@ -42,6 +42,7 @@ class Kernel extends HttpKernel
             'throttle:60000,1',
             'bindings',
             'crosstttp',
+            \App\Http\Middleware\CheckSafeDomain::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

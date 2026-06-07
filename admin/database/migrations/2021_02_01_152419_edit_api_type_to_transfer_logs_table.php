@@ -14,7 +14,11 @@ class EditApiTypeToTransferLogsTable extends Migration
     public function up()
     {
         Schema::table('transfer_logs', function (Blueprint $table) {
-            $table->string('api_type',50)->change();
+            $table->string('platform_type', 50)->nullable()->comment('Nền tảng game');
+            $table->integer('addtime')->default(0)->comment('Thời gian thêm');
+            $table->integer('settlementsday')->default(0)->comment('Ngày quyết toán');
+            $table->string('betid', 50)->nullable()->comment('Mã cược');
+            $table->string('remark', 100)->nullable()->comment('Ghi chú');
         });
     }
 
@@ -26,7 +30,7 @@ class EditApiTypeToTransferLogsTable extends Migration
     public function down()
     {
         Schema::table('transfer_logs', function (Blueprint $table) {
-            //
+            $table->dropColumn(['platform_type', 'addtime', 'settlementsday', 'betid', 'remark']);
         });
     }
 }

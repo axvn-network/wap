@@ -89,6 +89,13 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+
+        'backend' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/backend.log'),
+            'level' => 'info',
+            'days' => 30,
+        ],
     ],
 
 ];

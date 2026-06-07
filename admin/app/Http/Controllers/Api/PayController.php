@@ -980,14 +980,20 @@ class PayController extends Controller
                             'state' => 1
                         ];
                         TransferLog::create($arr);
-                        /*                    $Gamereport = new GamereportService();
-                                            $datae['uid'] = $userinfo->id;
-                                            $datae['pid'] = $userinfo->pid;
-                                            $datae['isagent'] = $userinfo->isagent;
-                                            $datae['redpackectnum'] = 1;
-                                            $datae['totalredpackect'] = $userredpacket->redpacketmoney;
-                                            $Gamereport->add($datae);*/
-                        return $this->returnMsg(200, '', '成功领取');
+                        
+                        // Cập nhật báo cáo game
+                        $Gamereport = new \App\Services\GamereportService();
+                        $datae = [
+                            'uid' => $userinfo->id,
+                            'pid' => $userinfo->pid,
+                            'isagent' => $userinfo->isagent,
+                            'totalredpackect' => $userredpacket->redpacketmoney,
+                        ];
+                        $Gamereport->add($datae);
+                        
+                        \Illuminate\Support\Facades\Log::channel('backend')->info("Người dùng nhận hồng bao (API)", ['uid' => $userinfo->id, 'amount' => $userredpacket->redpacketmoney]);
+
+                        return $this->returnMsg(200, '', 'Nhận thành công');
                     }
                 }else{
 

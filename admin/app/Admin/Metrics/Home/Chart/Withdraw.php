@@ -2,88 +2,101 @@
 
 namespace App\Admin\Metrics\Home\Chart;
 
-use App\Models\Withdraw as ModelsWithdraw;
 use Dcat\Admin\Admin;
 use Dcat\Admin\Widgets\ApexCharts\Chart;
+use App\Models\Withdraw as WithdrawModel;
+use Illuminate\Support\Carbon;
 
 class Withdraw extends Chart
 {
     public function __construct($containerSelector = null, $options = [])
     {
         parent::__construct($containerSelector, $options);
-
         $this->setUpOptions();
+        $this->title('Thống kê rút tiền'); // Adding a title
     }
 
     /**
-     * 初始化图表配置
+     * Initializes chart options.
      */
     protected function setUpOptions()
     {
         $color = Admin::color();
-
-        $colors = [$color->primary(), $color->primaryDarker()];
+        $colors = [$color->success(), $color->danger()];
 
         $this->options([
             'colors' => $colors,
             'chart' => [
                 'type' => 'area',
-                'height' => 430
-            ],
-            'plotOptions' => [
-                'bar' => [
-                    'horizontal' => true,
-                    'dataLabels' => [
-                        'position' => 'top',
-                    ],
-                ]
+                'height' => 430,
+                'sparkline' => ['enabled' => true],
             ],
             'dataLabels' => [
-                'enabled' => true,
-                'offsetX' => -6,
-                'style' => [
-                    'fontSize' => '12px',
-                    'colors' => ['#fff']
-                ]
+                'enabled' => false,
             ],
             'stroke' => [
-                'show' => true,
-                'width' => 1,
-                'colors' => ['#fff']
+                'curve' => 'smooth',
+                'width' => 2,
             ],
             'xaxis' => [
                 'categories' => [],
+            ],
+            'tooltip' => [
+                'x' => [
+                    'show' => false,
+                ],
+            ],
+            'legend' => [
+                'show' => true,
             ],
         ]);
     }
 
     /**
-     * 处理图表数据
+     * Handles chart data.
      */
     protected function buildData()
     {
-        for ($i=7; $i >= 0; $i--) { 
-            $date[] = date('Y-m-d',strtotime("-".$i."days"));
-            $date_x[] = date('m-d',strtotime("-".$i."days"));
-        }
-        $sum = [];
-        foreach ($date as $k => $v) {
-            $sum[$k] = ModelsWithdraw::whereDate('created_at',$v)->where('state',2)->sum('amount');
-        }
-        // 执行你的数据查询逻辑
-        $data = [
-            [
-                'data' => $sum
-            ]
-        ];
-        $categories = $date_x;
+        $approvedData = [];
+        $refusedData = [];
+        $categories = [];
 
-        $this->withData($data);
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i);
+            $dateString = $date->format('Y-m-d');
+            $category = $date->format('m-d');
+
+            $approvedCount = WithdrawModel::query()
+                ->where('state', 2) // Approved
+                ->whereDate('updated_at', $dateString)
+                ->count();
+
+            $refusedCount = WithdrawModel::query()
+                ->where('state', 3) // Refused
+                ->whereDate('updated_at', $dateString)
+                ->count();
+
+            $approvedData[] = $approvedCount;
+            $refusedData[] = $refusedCount;
+            $categories[] = $category;
+        }
+
+        $this->withData([
+            [
+                'name' => 'Đã duyệt',
+                'data' => $approvedData,
+            ],
+            [
+                'name' => 'Bị từ chối',
+                'data' => $refusedData,
+            ],
+        ]);
+
         $this->withCategories($categories);
     }
 
     /**
-     * 设置图表数据
+     * Sets chart data.
      *
      * @param array $data
      *
@@ -95,7 +108,7 @@ class Withdraw extends Chart
     }
 
     /**
-     * 设置图表类别.
+     * Sets chart categories.
      *
      * @param array $data
      *
@@ -107,14 +120,13 @@ class Withdraw extends Chart
     }
 
     /**
-     * 渲染图表
+     * Renders the chart.
      *
      * @return string
      */
     public function render()
     {
         $this->buildData();
-
         return parent::render();
     }
 }

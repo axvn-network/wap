@@ -19,7 +19,7 @@ class Pass extends RowAction
     /**
      * @return string
      */
-	protected $title = '通过';
+	protected $title = 'Duyệt';
 
     /**
      * Handle the action request.
@@ -30,17 +30,6 @@ class Pass extends RowAction
      */
     public function handle(Request $request)
     {
-        $id = $this->getKey();
-        $model = Withdraw::find($id);
-        $model->state = 2;
-        $model->save();
-
-        return $this->response()
-            ->success('审核成功')
-            ->refresh();
-            
-            
-            
         $id = $this->getKey();
         $withdraw = Withdraw::find($id);
         $bank_data = UserCard::where("id",$withdraw->card_id)->first();
@@ -88,7 +77,7 @@ class Pass extends RowAction
             $withdraw->state = 2;
             $withdraw->save();
             return $this->response()
-                ->success('审核成功')
+                ->success('Thao tác thành công')
                 ->refresh();
         }else{
             $withdraw->state = 3;
@@ -105,7 +94,7 @@ class Pass extends RowAction
 	 */
 	public function confirm()
 	{
-		return ['确定审核通过', ''];
+		return ['Xác nhận duyệt?', ''];
 	}
 
     /**

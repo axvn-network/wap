@@ -14,18 +14,18 @@ class CreateAgentSettlementsTable extends Migration
     public function up()
     {
         Schema::create('agent_settlements', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name',100)->comment('方案名称');
-            $table->tinyInteger('type')->default(1)->comment('结算类型 1返点 2返佣');
-            $table->decimal('realperson',6,2)->default(0)->comment('真人');
-            $table->decimal('electron',6,2)->default(0)->comment('电子');
-            $table->decimal('joker',6,2)->default(0)->comment('棋牌');
-            $table->decimal('sport',6,2)->default(0)->comment('体育');
-            $table->decimal('fish',6,2)->default(0)->comment('捕鱼');
-            $table->decimal('lottery',6,2)->default(0)->comment('彩票');
-            $table->decimal('e_sport',6,2)->default(0)->comment('电竞');
-            $table->decimal('member_fs',8,2)->default(0)->comment('会员返水');
-            $table->tinyInteger('state')->default(1)->comment('状态');
+            $table->id();
+            $table->string('name', 100)->comment('Tên kế hoạch');
+            $table->tinyInteger('type')->default(1)->comment('Loại quyết toán 1: Hoàn trả, 2: Hoa hồng');
+            $table->decimal('realperson', 6, 2)->default(0.00)->comment('Người thật');
+            $table->decimal('electron', 6, 2)->default(0.00)->comment('Điện tử');
+            $table->decimal('joker', 6, 2)->default(0.00)->comment('Bài');
+            $table->decimal('sport', 6, 2)->default(0.00)->comment('Thể thao');
+            $table->decimal('fish', 6, 2)->default(0.00)->comment('Bắn cá');
+            $table->decimal('lottery', 6, 2)->default(0.00)->comment('Xổ số');
+            $table->decimal('e_sport', 6, 2)->default(0.00)->comment('Thể thao điện tử');
+            $table->decimal('member_fs', 8, 2)->default(0.00)->comment('Hoàn trả thành viên');
+            $table->tinyInteger('state')->default(1)->comment('Trạng thái');
             $table->timestamps();
         });
     }

@@ -11,7 +11,8 @@ use Dcat\Admin\Http\Controllers\AdminController;
 
 class PaySettingController extends AdminController
 {
-    protected $state = [1 => '可用',0 => '禁用'];
+    protected $title = 'Cấu hình thanh toán';
+    protected $state = [1 => 'Bật', 0 => 'Tắt'];
 
     /**
      * Make a grid builder.
@@ -20,47 +21,27 @@ class PaySettingController extends AdminController
      */
     protected function grid()
     {
-        return Grid::make(new PaySetting(with(['bank_data'])), function (Grid $grid) {
-            $grid->column('id')->sortable();
-            $grid->column('bank_data.bank_name','银行');
-            $grid->column('bank_no');
-            $grid->column('bank_owner');
-            $grid->column('bank_address');
-            $grid->column('info');
-            $grid->column('state')->using($this->state);
-            $grid->column('created_at');
-            // $grid->column('updated_at')->sortable();
+        return Grid::make(new PaySetting(['bank_data']), function (Grid $grid) {
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('bank_data.bank_name', 'Ngân hàng');
+            $grid->column('bank_no', 'Số tài khoản');
+            $grid->column('bank_owner', 'Chủ tài khoản');
+            $grid->column('bank_address', 'Chi nhánh');
+            $grid->column('info', 'Ghi chú');
+            $grid->column('state', 'Trạng thái')->using($this->state)->label([
+                1 => 'success',
+                0 => 'danger',
+            ]);
+            $grid->column('created_at', 'Thời gian tạo');
         
             $grid->filter(function (Grid\Filter $filter) {
-                $filter->equal('id');
-        
+                $filter->equal('id', 'ID');
+                $filter->equal('bank_id', 'Ngân hàng')->select(Bank::pluck('bank_name', 'id'));
             });
+
             $grid->actions(function (Grid\Displayers\Actions $actions) {
                 $actions->disableView();
-                $actions->disableDelete();
             });
-        });
-    }
-
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     *
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        return Show::make($id, new PaySetting(), function (Show $show) {
-            $show->field('id');
-            $show->field('bank_id');
-            $show->field('bank_no');
-            $show->field('bank_owner');
-            $show->field('bank_address');
-            $show->field('info');
-            $show->field('state');
-            $show->field('created_at');
-            $show->field('updated_at');
         });
     }
 
@@ -71,23 +52,21 @@ class PaySettingController extends AdminController
      */
     protected function form()
     {
-        
         return Form::make(new PaySetting(), function (Form $form) {
-            $bank = Bank::orderBy('order','desc')->get();
-            $list = [];
-            foreach ($bank as $v) {
-                $list[$v->id] = $v->bank_name;
-            }
-            $form->display('id');
-            $form->select('bank_id','银行')->options($list)->required();
-            $form->text('bank_no')->required();
-            $form->text('bank_owner')->required();
-            $form->text('bank_address')->required();
-            $form->text('info');
-            $form->radio('state')->options($this->state)->default(1);
+            $list = Bank::orderBy('order', 'desc')->pluck('bank_name', 'id');
+            
+            $form->display('id', 'ID');
+            $form->select('bank_id', 'Ngân hàng')->options($list)->required();
+            $form->text('bank_no', 'Số tài khoản')->required();
+            $form->text('bank_owner', 'Chủ tài khoản')->required();
+            $form->text('bank_address', 'Chi nhánh')->required();
+            $form->text('info', 'Ghi chú');
+            $form->radio('state', 'Trạng thái')->options($this->state)->default(1);
         
-            $form->display('created_at');
-            $form->display('updated_at');
+            $form->display('created_at', 'Thời gian tạo');
+            $form->display('updated_at', 'Thời gian cập nhật');
+
+            $form->disableDeleteButton();
         });
     }
 }

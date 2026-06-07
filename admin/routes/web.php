@@ -12,7 +12,6 @@
 */
 
 
-// ---------------代理--------------------
 Route::domain(env('AGENT_URL'))->group(function (){
     Route::get('kit/captcha/{tmp}', 'Agent\AuthController@captcha');
     Route::any('/login','Agent\AuthController@login');
@@ -48,7 +47,6 @@ Route::domain(env('AGENT_URL'))->group(function (){
 
 
 
-// -------------------手机版-----------------
 Route::domain(env('WAP_URL'))->group(function (){
 
     Route::any('/login','Wap\IndexController@login');
@@ -83,7 +81,7 @@ Route::domain(env('WAP_URL'))->group(function (){
         Route::post('/editPasswordDo','Wap\IndexController@editPasswordDo');
         Route::post('/editPayPasswordDo','Wap\IndexController@editPayPasswordDo');
         Route::post('/uptransferstatus','Member\MemberController@uptransferstatus');
-        // 充值
+        
         Route::post('/getBankCardData','Member\PayController@getBankCardData');
         Route::get('/recharge','Wap\IndexController@recharge');
         Route::post('/rechargeDo','Member\PayController@rechargeDo');
@@ -103,7 +101,7 @@ Route::domain(env('WAP_URL'))->group(function (){
 });
 
 
-// ----pc----
+
 Route::get('/','Web\IndexController@index');
 Route::get('/download','Web\IndexController@app');
 Route::get('/sport','Web\IndexController@sport');
@@ -123,7 +121,7 @@ Route::post('/registerDo','Member\AuthController@registerDo');
 Route::get('/login','Member\AuthController@login')->name('login');
 Route::post('/loginDo','Member\AuthController@loginDo');
 Route::get('/logout','Member\AuthController@logout');
-Route::post('/upload','Web\IndexController@upload');//上传文件
+Route::post('/upload','Web\IndexController@upload');
 Route::any('/notice','Web\IndexController@notice');
 Route::any('/notify','Member\PayController@notify');
 Route::any('/fourwaynotify','Member\PayController@fourwaynotify');
@@ -137,16 +135,16 @@ Route::post('/doactivityapply','Member\MemberController@doactivity');
 Route::post('/user_balance','\App\Admin\Renderable\UserBalance@user_balance');
 Route::get('/pull','Web\IndexController@pull');
 Route::prefix('member')->middleware(['auth'])->group(function () {
-    Route::get('/center','Member\MemberController@center');//个人中心
-    Route::get('/centernew','Member\MemberController@centernew');//个人中心
-    Route::post('/fillData','Member\MemberController@fillData');//完善信息
-    Route::get('/editPassword','Member\AuthController@editPassword');//修改密码
+    Route::get('/center','Member\MemberController@center');
+    Route::get('/centernew','Member\MemberController@centernew');
+    Route::post('/fillData','Member\MemberController@fillData');
+    Route::get('/editPassword','Member\AuthController@editPassword');
     Route::post('/editPasswordDo','Member\AuthController@editPasswordDo');
-    Route::get('/editPayPassword','Member\AuthController@editPayPassword');//修改取款密码
+    Route::get('/editPayPassword','Member\AuthController@editPayPassword');
     Route::post('/editPayPasswordDo','Member\AuthController@editPayPasswordDo');
     Route::any('/getbanklist','Member\AuthController@banklist');
     Route::any('/activityprogress','Member\MemberController@progress');
-    // 充值
+    
     Route::get('/recharge','Member\PayController@recharge');
     Route::post('/rechargeDo','Member\PayController@rechargeDo');
     Route::get('/bindCard','Member\PayController@bindCard');
@@ -177,7 +175,7 @@ Route::prefix('member')->middleware(['auth'])->group(function () {
     Route::any('/fanshui','Member\MemberController@fanshui');
     Route::any('/transRecord','Member\MemberController@transRecord');
     Route::any('/betRecord','Member\MemberController@betRecord');
-    Route::any('/suggestion','Member\MemberController@suggestion');// 意见反馈
+    Route::any('/suggestion','Member\MemberController@suggestion');
     Route::get('/vip','Member\MemberController@vip');
     Route::get('/mail/{type}','Member\MemberController@mail');
     Route::get('/mail_detail/{id}','Member\MemberController@mailDetail');
@@ -187,10 +185,17 @@ Route::prefix('member')->middleware(['auth'])->group(function () {
     Route::post('/douserredpacket','Member\MemberController@doUserRedPacket');
     Route::any('/getuserallbalance','Member\PayController@userAllBalance');
 
-    Route::get('/getUserBalance','Member\MemberController@getUserBalance');//个人中心
-    Route::get('/message','Web\IndexController@messagecenter');//个人中心
+    Route::get('/getUserBalance','Member\MemberController@getUserBalance');
+    Route::get('/message','Web\IndexController@messagecenter');
     Route::any('/activityRecord','Member\MemberController@progress');
     Route::any('/redpacket','Member\MemberController@redPacket');
     
 });
 
+Route::group([ 
+    'prefix' => config('admin.route.prefix'), 
+    'namespace' => 'App\Admin\Controllers', 
+    'middleware' => config('admin.route.middleware'), 
+], function () { 
+    Route::resource('transactions', 'TransactionController'); 
+});

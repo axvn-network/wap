@@ -7,40 +7,33 @@ use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Dcat\Admin\Http\Controllers\AdminController;
-use App\Models\UserVip;
 
 class MessageController extends AdminController
 {
-    protected $type = [1 => '通知',2 => '活动',3 => '公告'];
-    
-    protected $vip =[];
-    
-    protected $isagent = [1 => '代理'];
+    protected $title = 'Tin nhắn';
 
     /**
-     * Make a grid builder.
+     * Tạo giao diện danh sách.
      *
      * @return Grid
      */
     protected function grid()
     {
-        return Grid::make(new Message(), function (Grid $grid) {
-            $grid->column('id')->sortable();
-            $grid->column('type')->using($this->type);
-            $grid->column('title');
-            //$grid->column('content')->limit(20);
+        return Grid::make(Message::with(['user']), function (Grid $grid) {
+            $grid->column('id', 'ID')->sortable();
+            $grid->column('user.username', 'Tên người dùng');
+            $grid->column('content', 'Nội dung');
             $grid->column('created_at');
-            // $grid->column('updated_at')->sortable();
-        
+
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->equal('id');
-        
+                $filter->like('user.username', 'Tên người dùng');
             });
         });
     }
 
     /**
-     * Make a show builder.
+     * Tạo giao diện xem chi tiết.
      *
      * @param mixed $id
      *
@@ -50,8 +43,7 @@ class MessageController extends AdminController
     {
         return Show::make($id, new Message(), function (Show $show) {
             $show->field('id');
-            $show->field('type')->using($this->type);
-            $show->field('title');
+            $show->field('user_id');
             $show->field('content');
             $show->field('created_at');
             $show->field('updated_at');
@@ -59,7 +51,7 @@ class MessageController extends AdminController
     }
 
     /**
-     * Make a form builder.
+     * Tạo form thêm/sửa.
      *
      * @return Form
      */
@@ -67,27 +59,9 @@ class MessageController extends AdminController
     {
         return Form::make(new Message(), function (Form $form) {
             $form->display('id');
-           
-            $form->select('type')->options($this->type)->required();
-            
-             //vip等级
-            $settlements = UserVip::all();
-            $options = [];
-            foreach ($settlements as $k => $v) {
-                $options[$v->id] = $v->vipname;
-            }
-            
-            $form->select('vip_id','vip等级')->options($options)->required();
-            
-            $form->select('isagent','发送目标')->options($this->isagent)->required();
-            
-            $form->number('user_id','用户id')->required();
-            
-            $form->text('title')->required();
-            $form->editor('content');
-        
-            
-        
+            $form->text('user_id')->required();
+            $form->textarea('content')->required();
+
             $form->display('created_at');
             $form->display('updated_at');
         });
